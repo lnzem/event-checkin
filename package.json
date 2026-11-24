@@ -1,0 +1,30 @@
+{
+  "name": "event-checkin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "echo No build step required"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lnzem/event-checkin.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/lnzem/event-checkin/issues"
+  },
+  "homepage": "https://github.com/lnzem/event-checkin#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.119.2",
+    "qrcode": "^1.5.4",
+    "resend": "^6.39.0"
+  }
+}

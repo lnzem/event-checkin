@@ -1,0 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+:root {
+  /* Color */
+  --color-bg: #0c0d10;
+  --color-surface: #1a1c22;
+  --color-text: #f8f8fa;
+  --color-text-muted: #a5a7b2;
+  --color-accent: #c7f36b;
+  --color-accent-ink: #10140b;
+  --color-qr-bg: #ffffff;
+  --color-qr-ink: #24262b;
+  --color-qr-muted: #666b70;
+  --color-error: #ff6b6b;
+
+  /* Typography */
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --fs-h1: 27px;
+  --fs-header: 17px;
+  --fs-back: 25px;
+  --fs-card-title: 18px;
+  --fs-input: 15px;
+  --fs-button: 15px;
+  --fs-body: 13px;
+  --fs-label: 12px;
+  --fs-eyebrow: 11px;
+
+  /* Radius */
+  --radius-card: 16px;
+  --radius-pass: 18px;
+  --radius-field: 12px;
+  --radius-button: 14px;
+  --radius-qr: 12px;
+
+  /* Spacing */
+  --space-page-x: 24px;
+  --space-page-top: 26px;
+  --space-page-bottom: 24px;
+  --space-stack: 20px;
+  --space-card: 18px;
+  --space-card-gap: 12px;
+  --space-field-x: 16px;
+  --space-field-y: 13px;
+  --space-field-gap: 6px;
+  --space-button-y: 15px;
+  --content-max-width: 342px;
+  --desktop-max-width: 460px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
