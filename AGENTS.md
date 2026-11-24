@@ -1,44 +1,38 @@
-# AGENTS.md
+﻿# AGENTS.md
 
 ## Project
 Event registration + QR ticketing + on-site check-in system.
-Flow: Registration form -> Google Sheet -> unique QR generated -> confirmation email with QR -> scanner page marks "Checked In".
+Flow: Registration form -> Vercel API -> Supabase -> unique QR generated -> Resend confirmation email -> scanner page marks "Checked In".
 
 ## Stack (do not change without asking)
-- Frontend: plain HTML, CSS, vanilla JS (no frameworks, no build step)
-- Backend: Google Apps Script (web app) bound to a Google Sheet
-- Email: MailApp inside Apps Script
-- QR generation: api.qrserver.com (fetch PNG blob, attach inline) 
-- Scanner: html5-qrcode library via CDN, hosted on GitHub Pages
-- Hosting: GitHub Pages for /web, Apps Script deployment for backend
+- Frontend: plain HTML, CSS, vanilla JS in /web (no frontend frameworks, no build step)
+- Backend: Vercel Serverless Functions in /api (Node.js)
+- Database: Supabase (@supabase/supabase-js)
+- Email: Resend SDK (attach QR PNG inline via cid)
+- QR generation: qrcode npm package (generate PNG buffer server-side)
+- Scanner: html5-qrcode library via CDN
+- Hosting: Vercel (static /web + /api functions)
 
 ## Structure
 - /web/register   -> registration form
 - /web/scanner    -> check-in scanner page
-- /apps-script    -> Code.gs, appsscript.json (deployed via copy/paste or clasp)
-- /design         -> Figma screenshots (UI reference)
-- /docs           -> test logs, setup notes
+- /web/shared     -> tokens.css and shared utilities
+- /api            -> Vercel serverless endpoints (register.js, checkin.js, export.js)
+- /design         -> Figma reference
+- /docs           -> design-tokens.md, setup notes
 
-## Data model (Sheet columns, in order)
-Timestamp | Ticket ID | Full Name | Email | Organization | Contact Number | QR Sent | Checked In | Checked In At
+## Data model (Supabase table: registrations)
+id (uuid, pk) | created_at (timestamptz) | ticket_id (text, unique) | full_name (text) | email (text, unique) | organization (text) | contact_number (text) | qr_sent (boolean) | checked_in (boolean) | checked_in_at (timestamptz)
 
 ## Rules
-- Ticket ID = short unique string (e.g. EVT-XXXXXX), generated server-side, never client-side.
+- Ticket ID = short unique string (e.g. SEM-XXXXXX), generated server-side, never client-side.
 - Validate on BOTH client and server (required fields, email format, PH mobile number format).
-- Prevent duplicate registrations by email.
-- Check-in must be idempotent: scanning an already checked-in ticket shows "Already checked in at <time>", not an error.
-- No secrets in the repo. Script IDs/URLs go in a config.js that is documented in README.
-- Mobile-first; the scanner page will be used on phones.
-- Match the visual style in /design (colors, type, spacing, component shapes). Extract tokens into CSS variables in one file.
+- Prevent duplicate registrations by email (return 409 Conflict with a clear message).
+- Check-in must be idempotent: scanning an already checked-in ticket returns 200 with status "already_checked_in" and original timestamp.
+- Never commit secrets. Read SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY, and EXPORT_KEY from process.env.
+- Mobile-first (390px target); match /docs/design-tokens.md.
 
 ## Workflow
 - One feature per branch; small commits using conventional commits (feat:, fix:, chore:).
-- After each task: summarize what changed, list files touched, and give me the exact manual test steps.
-- Do not mark a task done until its verification step is described and I confirm it passed.
-- Ask before adding any dependency.
-
-## Definition of done per phase
-1. Form: test entry lands in Sheet with all fields correct.
-2. QR: test row produces a unique QR for that Ticket ID.
-3. Email: test inbox receives email with QR visible inline.
-4. Scanner: scanning test QR flips Checked In = TRUE with timestamp.
+- After each task: summarize what changed, list files touched, and give exact manual test steps.
+- Ask before adding any new dependency.

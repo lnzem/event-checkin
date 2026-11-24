@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Seminar Registration</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/web/shared/tokens.css">
+  <link rel="stylesheet" href="/web/register/style.css">
+</head>
+<body>
+  <main class="page">
+
+    <!-- Registration form -->
+    <section id="form-section" class="card">
+      <h1 class="h1">Register</h1>
+      <form id="register-form" novalidate>
+        <div class="field">
+          <input type="text" id="fullName" name="full_name" required placeholder=" ">
+          <label class="infield-label" for="fullName">Full Name</label>
+          <div class="error-msg"></div>
+        </div>
+        <div class="field">
+          <input type="email" id="email" name="email" required placeholder=" ">
+          <label class="infield-label" for="email">Email</label>
+          <div class="error-msg"></div>
+        </div>
+        <div class="field">
+          <input type="text" id="org" name="organization" required placeholder=" ">
+          <label class="infield-label" for="org">Organization</label>
+          <div class="error-msg"></div>
+        </div>
+        <div class="field">
+          <input type="tel" id="contact" name="contact_number" required placeholder=" ">
+          <label class="infield-label" for="contact">Contact Number</label>
+          <div class="error-msg"></div>
+        </div>
+        <button type="submit" id="submit-btn" class="primary-btn">Register</button>
+      </form>
+    </section>
+
+    <!-- Success QR pass (hidden until successful registration) -->
+    <section id="success-section" class="success-card hidden">
+      <h1 class="h1">You're registered!</h1>
+      <p class="body">Present this QR code at the venue.</p>
+      <div class="qr-box">
+        <img id="qr-image" src="" alt="QR code">
+      </div>
+      <p class="pass-detail">Ticket ID: <strong id="ticket-id"></strong></p>
+      <p class="pass-detail">Name: <strong id="attendee-name"></strong></p>
+      <button type="button" id="back-btn" class="primary-btn">Register another</button>
+    </section>
+
+  </main>
+  <script src="/web/register/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+/* Registration page styles */
+
+.page {
+  padding: var(--space-page-top) var(--space-page-x) var(--space-page-bottom);
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-stack);
+}
+
+@media (min-width: 768px) {
+  .page {
+    max-width: var(--desktop-max-width);
+    padding-top: 64px;
+    padding-bottom: 64px;
+  }
+}
+
+/* Cards */
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  padding: var(--space-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-card-gap);
+}
+
+/* Typography */
+.h1 {
+  font-size: var(--fs-h1);
+  font-weight: 700;
+}
+
+.body {
+  font-size: var(--fs-body);
+  color: var(--color-text-muted);
+}
+
+/* In-field label pattern */
+.field {
+  position: relative;
+}
+
+.field input {
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: var(--fs-input);
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: none;
+  border-radius: var(--radius-field);
+  padding: 22px var(--space-field-x) 8px;
+}
+
+.field input::placeholder {
+  color: transparent;
+}
+
+.field input:focus {
+  outline: 1.5px solid var(--color-accent);
+}
+
+.infield-label {
+  position: absolute;
+  left: var(--space-field-x);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: var(--fs-input);
+  color: var(--color-text-muted);
+  pointer-events: none;
+  transition: top 0.15s, font-size 0.15s, color 0.15s;
+}
+
+.field input:focus + .infield-label,
+.field input:not(:placeholder-shown) + .infield-label {
+  top: 12px;
+  font-size: var(--fs-label);
+  color: var(--color-accent);
+}
+
+/* Validation error */
+.error-msg {
+  font-size: var(--fs-label);
+  color: var(--color-error);
+  min-height: 16px;
+  padding-left: 2px;
+}
+
+/* Primary button */
+.primary-btn {
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: var(--fs-button);
+  font-weight: 600;
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  border: none;
+  border-radius: var(--radius-button);
+  padding: var(--space-button-y) 0;
+  cursor: pointer;
+  position: relative;
+}
+
+.primary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.primary-btn.loading {
+  color: transparent;
+}
+
+.primary-btn.loading::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  margin-left: -9px;
+  margin-top: -9px;
+  border: 2.5px solid var(--color-accent-ink);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Hidden utility */
+.hidden {
+  display: none !important;
+}
+
+/* Success / QR pass card */
+.success-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-pass);
+  padding: 22px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.qr-box {
+  width: 244px;
+  height: 244px;
+  background: var(--color-qr-bg);
+  border-radius: var(--radius-qr);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.qr-box img {
+  width: 220px;
+  height: 220px;
+}
+
+.pass-detail {
+  font-size: var(--fs-body);
+  color: var(--color-text-muted);
+}
+
+.pass-detail strong {
+  color: var(--color-text);
+}

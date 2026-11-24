@@ -1,0 +1,8 @@
+{
+  "outputDirectory": ".",
+  "rewrites": [
+    { "source": "/", "destination": "/web/register/index.html" },
+    { "source": "/register", "destination": "/web/register/index.html" },
+    { "source": "/scanner", "destination": "/web/scanner/index.html" }
+  ]
+}
