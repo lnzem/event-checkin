@@ -1,9 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
-
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     res.status(405).json({ message: 'Method Not Allowed' });
@@ -16,12 +12,36 @@ export default async function handler(req, res) {
     return;
   }
 
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.error('Missing Supabase configuration: SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is not set');
+    res.status(500).json({ message: 'Server configuration error' });
+    return;
+  }
+
+  let supabaseUrl;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  try {
+    supabaseUrl = new URL(process.env.SUPABASE_URL.trim()).origin;
+  } catch {
+    console.error('Invalid SUPABASE_URL configuration');
+    res.status(500).json({ message: 'Server configuration error' });
+    return;
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
   const { data, error } = await supabase
     .from('registrations')
-    .select('*')
+    .select('id, created_at, ticket_id, full_name, email, organization, contact_number, qr_sent, checked_in, checked_in_at')
     .order('created_at', { ascending: true });
 
   if (error) {
+    console.error('Database error during registrations export:', {
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint
+    });
     res.status(500).json({ message: 'Database error' });
     return;
   }

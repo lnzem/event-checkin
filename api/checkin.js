@@ -1,15 +1,28 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
-
 export default async function handler(req, res) {
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.error('Missing Supabase configuration: SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is not set');
+    res.status(500).json({ message: 'Server configuration error' });
+    return;
+  }
+
   if (req.method !== 'POST') {
     res.status(405).json({ message: 'Method Not Allowed' });
     return;
   }
+
+  let supabaseUrl;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  try {
+    supabaseUrl = new URL(process.env.SUPABASE_URL.trim()).origin;
+  } catch {
+    console.error('Invalid SUPABASE_URL configuration');
+    res.status(500).json({ message: 'Server configuration error' });
+    return;
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseKey);
 
   const raw = req.body?.ticket_id;
   const ticket_id = typeof raw === 'string' ? raw.trim().toUpperCase() : '';
@@ -30,6 +43,12 @@ export default async function handler(req, res) {
     return;
   }
   if (lookupErr) {
+    console.error('Database error during ticket lookup:', {
+      code: lookupErr.code,
+      message: lookupErr.message,
+      details: lookupErr.details,
+      hint: lookupErr.hint
+    });
     res.status(500).json({ status: 'error', message: 'Database error' });
     return;
   }
@@ -53,6 +72,12 @@ export default async function handler(req, res) {
     .eq('id', row.id);
 
   if (updateErr) {
+    console.error('Database error during checkin update:', {
+      code: updateErr.code,
+      message: updateErr.message,
+      details: updateErr.details,
+      hint: updateErr.hint
+    });
     res.status(500).json({ status: 'error', message: 'Failed to update check-in' });
     return;
   }
