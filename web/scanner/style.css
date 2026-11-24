@@ -1,0 +1,167 @@
+/* Scanner page styles */
+
+.page {
+  padding: var(--space-page-top) var(--space-page-x) var(--space-page-bottom);
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-stack);
+}
+
+@media (min-width: 768px) {
+  .page {
+    max-width: var(--desktop-max-width);
+    padding-top: 64px;
+    padding-bottom: 64px;
+  }
+}
+
+/* Header */
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.back-link {
+  font-size: var(--fs-back);
+  color: var(--color-text);
+  text-decoration: none;
+  line-height: 1;
+}
+
+.header-title {
+  font-size: var(--fs-header);
+  font-weight: 600;
+}
+
+/* Cards */
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  padding: var(--space-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-card-gap);
+}
+
+.card-title {
+  font-size: var(--fs-card-title);
+  font-weight: 600;
+}
+
+/* QR reader container */
+#reader {
+  width: 100%;
+  border-radius: var(--radius-qr);
+  overflow: hidden;
+}
+
+#reader video {
+  border-radius: var(--radius-qr);
+}
+
+/* In-field label pattern (reuse from register) */
+.field {
+  position: relative;
+}
+
+.field input {
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: var(--fs-input);
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: none;
+  border-radius: var(--radius-field);
+  padding: 22px var(--space-field-x) 8px;
+}
+
+.field input::placeholder {
+  color: transparent;
+}
+
+.field input:focus {
+  outline: 1.5px solid var(--color-accent);
+}
+
+.infield-label {
+  position: absolute;
+  left: var(--space-field-x);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: var(--fs-input);
+  color: var(--color-text-muted);
+  pointer-events: none;
+  transition: top 0.15s, font-size 0.15s, color 0.15s;
+}
+
+.field input:focus + .infield-label,
+.field input:not(:placeholder-shown) + .infield-label {
+  top: 12px;
+  font-size: var(--fs-label);
+  color: var(--color-accent);
+}
+
+/* Primary button */
+.primary-btn {
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: var(--fs-button);
+  font-weight: 600;
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  border: none;
+  border-radius: var(--radius-button);
+  padding: var(--space-button-y) 0;
+  cursor: pointer;
+}
+
+.primary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Result card */
+.result-card {
+  border-radius: var(--radius-card);
+  padding: var(--space-card);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.result-card.status-checked-in {
+  background: #1a2e10;
+  border: 1.5px solid var(--color-accent);
+}
+
+.result-card.status-already {
+  background: #2a2510;
+  border: 1.5px solid #f0c040;
+}
+
+.result-card.status-error {
+  background: #2e1414;
+  border: 1.5px solid var(--color-error);
+}
+
+.result-title {
+  font-size: var(--fs-card-title);
+  font-weight: 700;
+}
+
+.result-detail {
+  font-size: var(--fs-body);
+  color: var(--color-text-muted);
+}
+
+.result-detail strong {
+  color: var(--color-text);
+}
+
+/* Hidden utility */
+.hidden {
+  display: none !important;
+}

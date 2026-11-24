@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Check-In Scanner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/web/shared/tokens.css">
+  <link rel="stylesheet" href="/web/scanner/style.css">
+</head>
+<body>
+  <main class="page">
+
+    <header class="page-header">
+      <a href="/" class="back-link" aria-label="Back">‹</a>
+      <span class="header-title">Check-In Scanner</span>
+    </header>
+
+    <!-- Camera scanner -->
+    <section class="card">
+      <div id="reader"></div>
+      <button type="button" id="toggle-cam" class="primary-btn">Start Camera</button>
+    </section>
+
+    <!-- Manual entry fallback -->
+    <section class="card">
+      <h2 class="card-title">Manual Entry</h2>
+      <div class="field">
+        <input type="text" id="manual-ticket" placeholder=" " autocapitalize="characters">
+        <label class="infield-label" for="manual-ticket">Ticket ID</label>
+      </div>
+      <button type="button" id="manual-btn" class="primary-btn">Check In</button>
+    </section>
+
+    <!-- Result feedback -->
+    <section id="result" class="result-card hidden"></section>
+
+  </main>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="/web/scanner/app.js"></script>
+</body>
+</html>
