@@ -119,7 +119,7 @@ export default async function handler(req, res) {
   if (process.env.RESEND_API_KEY) {
     try {
       const resend = new Resend(process.env.RESEND_API_KEY);
-      await resend.emails.send({
+      const { data, error } = await resend.emails.send({
         from: 'onboarding@resend.dev',
         to: email,
         subject: 'Seminar Registration Confirmation',
@@ -133,8 +133,11 @@ export default async function handler(req, res) {
           }
         ]
       });
-      // Mark QR as sent
-      if (row?.id) {
+
+      // Resend can reject a message in the response without throwing.
+      if (error || !data?.id) {
+        console.error('Resend rejected confirmation email:', error?.name, error?.statusCode, error?.message);
+      } else if (row?.id) {
         await supabase.from('registrations').update({ qr_sent: true }).eq('id', row.id);
       }
     } catch (err) {
