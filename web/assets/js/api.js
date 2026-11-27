@@ -42,7 +42,9 @@ export async function apiFetch(path, { method = 'GET', body, auth = true, header
     body: body === undefined ? undefined : body instanceof FormData ? body : JSON.stringify(body),
   });
 
-  if ((res.status === 401 || res.status === 403) && typeof unauthorizedHandler === 'function') {
+  // 401 means the session is missing or expired. A 403 means the user is
+  // signed in but lacks permission, so it must not clear a valid session.
+  if (res.status === 401 && typeof unauthorizedHandler === 'function') {
     unauthorizedHandler(res.status);
   }
 

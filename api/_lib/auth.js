@@ -29,7 +29,13 @@ export async function requireAdmin(req, res, supabase) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (error || !profile || profile.role !== 'admin') {
+  if (error) {
+    console.error('Admin profile lookup error:', error.code, error.message);
+    sendError(res, 500, 'server_error', 'Could not verify admin access.');
+    return null;
+  }
+
+  if (!profile || profile.role !== 'admin') {
     sendError(res, 403, 'forbidden', 'Admin access required.');
     return null;
   }
