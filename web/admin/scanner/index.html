@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Check-In Scanner — Event Check-In</title>
+  <link rel="stylesheet" href="/web/assets/css/main.css">
+  <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js" defer></script>
+  <style>
+    .scanner-pin {
+      position: sticky;
+      top: 64px;
+      z-index: 20;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: var(--space-3) 0;
+    }
+    .scanner-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-5);
+      align-items: start;
+    }
+    @media (min-width: 900px) {
+      .scanner-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .camera-box {
+      position: relative;
+      width: 100%;
+      min-height: 280px;
+      background: #0f172a;
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #e2e8f0;
+    }
+    #qr-reader {
+      width: 100%;
+    }
+    .scan-guide {
+      position: absolute;
+      inset: 18%;
+      border: 2px solid rgba(255, 255, 255, 0.55);
+      border-radius: 12px;
+      pointer-events: none;
+    }
+    .result-card {
+      border-radius: var(--radius);
+      padding: var(--space-5);
+      border: 2px solid var(--border);
+      background: var(--surface);
+      transition: opacity 0.4s ease;
+    }
+    .result-card.is-faded {
+      opacity: 0.72;
+    }
+    .result-success {
+      border-color: var(--success);
+      background: var(--success-soft);
+    }
+    .result-warning {
+      border-color: var(--warning);
+      background: var(--warning-soft);
+    }
+    .result-danger {
+      border-color: var(--danger);
+      background: var(--danger-soft);
+    }
+    .scanner-btn {
+      min-height: 56px;
+      font-size: 1rem;
+    }
+    .recent-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      min-height: 48px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--text);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+    .recent-item:hover {
+      background: var(--surface-subtle);
+    }
+  </style>
+</head>
+<body>
+  <header id="admin-header"></header>
+
+  <div id="scanner-pin-wrap"></div>
+
+  <main class="container stack-lg" style="padding-top:20px;padding-bottom:48px;">
+    <div id="scanner-root" aria-live="polite"></div>
+  </main>
+
+  <script type="module" src="/web/assets/js/pages/admin-scanner.js"></script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Event Check-In — Browse &amp; Register for Events</title>
+  <meta name="description" content="Discover upcoming seminars and events, register in under a minute, and get your instant QR ticket.">
+  <meta property="og:title" content="Event Check-In — Browse & Register for Events">
+  <meta property="og:description" content="Discover upcoming seminars and events, register in under a minute, and get your instant QR ticket.">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="/web/assets/css/main.css">
+  <style>
+    .hero {
+      background: radial-gradient(120% 100% at 80% 0%, var(--accent-soft) 0%, transparent 60%), var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: var(--space-10) 0;
+    }
+    @media (min-width: 768px) {
+      .hero { padding: clamp(48px, 8vh, 84px) 0; }
+    }
+    .events-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-5);
+    }
+    @media (min-width: 640px) {
+      .events-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 1024px) {
+      .events-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .steps-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+    }
+    @media (min-width: 768px) {
+      .steps-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .step-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main>
+    <section class="hero">
+      <div class="container stack" style="max-width:760px;margin:0 auto;text-align:center;">
+        <h1 style="margin:0;">Fast event registration and QR check-in</h1>
+        <p class="muted" style="font-size:1.0625rem;margin:0 auto;max-width:560px;">
+          Browse upcoming seminars and workshops, reserve your spot in under a minute, and get your QR ticket straight to your inbox.
+        </p>
+        <div class="row" style="justify-content:center;padding-top:8px;">
+          <a href="#events" class="btn btn-primary">Browse upcoming events</a>
+          <button type="button" id="find-ticket-btn" class="btn btn-secondary">Find my ticket</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="events" class="container stack-lg" style="padding-top:40px;padding-bottom:40px;">
+      <div class="row-between">
+        <div class="tabs" role="tablist" aria-label="Event categories" id="event-tabs">
+          <button type="button" class="tab-btn" role="tab" id="tab-live" data-tab="live" aria-selected="false" aria-controls="events-panel">
+            Happening now <span class="chip chip-muted" id="count-live">0</span>
+          </button>
+          <button type="button" class="tab-btn" role="tab" id="tab-upcoming" data-tab="upcoming" aria-selected="true" aria-controls="events-panel">
+            Upcoming <span class="chip chip-muted" id="count-upcoming">0</span>
+          </button>
+          <button type="button" class="tab-btn" role="tab" id="tab-past" data-tab="past" aria-selected="false" aria-controls="events-panel">
+            Past <span class="chip chip-muted" id="count-past">0</span>
+          </button>
+        </div>
+
+        <div style="width:100%;max-width:300px;">
+          <label class="sr-only" for="event-search">Search events by title or venue</label>
+          <input id="event-search" class="input" type="search" placeholder="Search title or venue…">
+        </div>
+      </div>
+
+      <div id="events-panel" role="tabpanel" aria-live="polite" class="stack"></div>
+    </section>
+
+    <section class="container" style="padding-top:16px;padding-bottom:32px;">
+      <div class="stack">
+        <h2 style="text-align:center;">How it works</h2>
+        <div class="steps-grid">
+          <div class="card stack-sm">
+            <span class="step-num">1</span>
+            <h3 style="margin:0;">Pick an event</h3>
+            <p class="muted" style="margin:0;">Browse live or upcoming events and check available spots.</p>
+          </div>
+          <div class="card stack-sm">
+            <span class="step-num">2</span>
+            <h3 style="margin:0;">Register in under a minute</h3>
+            <p class="muted" style="margin:0;">Sign up as a guest or log in to save your tickets in one place.</p>
+          </div>
+          <div class="card stack-sm">
+            <span class="step-num">3</span>
+            <h3 style="margin:0;">Show your QR at the door</h3>
+            <p class="muted" style="margin:0;">Present your emailed or saved QR code for instant check-in.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+
+  <script type="module" src="/web/assets/js/pages/landing.js"></script>
+</body>
+</html>

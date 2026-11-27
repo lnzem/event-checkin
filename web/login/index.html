@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Log in — Event Check-In</title>
+  <meta name="description" content="Log in with a magic link to view and manage your event tickets.">
+  <meta property="og:title" content="Log in — Event Check-In">
+  <meta property="og:description" content="Log in with a magic link to view and manage your event tickets.">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="/web/assets/css/main.css">
+  <style>
+    .login-shell {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-6) var(--space-4);
+    }
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+    }
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      color: var(--text-muted);
+      font-size: 0.8125rem;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+  </style>
+</head>
+<body>
+  <main class="login-shell stack-lg">
+    <a class="brand" href="/">
+      <span class="brand-mark" aria-hidden="true">E</span>
+      <span>Event Check-In</span>
+    </a>
+
+    <section class="card login-card stack" id="login-card" aria-live="polite">
+      <div class="stack-sm">
+        <h1 style="font-size:1.5rem;margin:0;">Log in to your tickets</h1>
+        <p class="muted" style="margin:0;font-size:0.9375rem;">
+          Logging in is optional. You can always register as a guest. <a href="/">Browse events</a>
+        </p>
+      </div>
+      <div id="login-content"></div>
+    </section>
+  </main>
+
+  <script type="module" src="/web/assets/js/pages/login.js"></script>
+</body>
+</html>

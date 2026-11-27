@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin Dashboard — Event Check-In</title>
+  <link rel="stylesheet" href="/web/assets/css/main.css">
+  <style>
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-3);
+    }
+    @media (min-width: 768px) {
+      .stats-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    .stat-val {
+      font-size: 1.75rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .mini-progress {
+      height: 6px;
+      background: var(--surface-subtle);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .mini-progress-fill {
+      height: 100%;
+      background: var(--accent);
+    }
+    .row-actions {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+  </style>
+</head>
+<body>
+  <header id="admin-header"></header>
+
+  <main class="container stack-lg" style="padding-top:24px;padding-bottom:48px;">
+    <div class="row-between">
+      <h1 style="margin:0;">Events</h1>
+      <div class="row">
+        <button type="button" id="refresh-btn" class="btn btn-secondary btn-sm">Refresh</button>
+        <a href="/admin/event" class="btn btn-primary btn-sm">+ New event</a>
+      </div>
+    </div>
+
+    <section class="stats-grid" aria-label="Event statistics">
+      <div class="card stack-sm" style="gap:4px;">
+        <span class="muted" style="font-size:0.8125rem;">Total events</span>
+        <span class="stat-val" id="stat-total">—</span>
+      </div>
+      <div class="card stack-sm" style="gap:4px;">
+        <span class="muted" style="font-size:0.8125rem;">Upcoming events</span>
+        <span class="stat-val" id="stat-upcoming">—</span>
+      </div>
+      <div class="card stack-sm" style="gap:4px;">
+        <span class="muted" style="font-size:0.8125rem;">Total registrations</span>
+        <span class="stat-val" id="stat-regs">—</span>
+      </div>
+      <div class="card stack-sm" style="gap:4px;">
+        <span class="muted" style="font-size:0.8125rem;">Checked in today</span>
+        <span class="stat-val" id="stat-today">—</span>
+      </div>
+    </section>
+
+    <section class="stack">
+      <div class="row-between">
+        <div class="tabs" role="tablist" aria-label="Filter events" id="filter-chips">
+          <button type="button" class="tab-btn" role="tab" data-filter="all" aria-selected="true">All</button>
+          <button type="button" class="tab-btn" role="tab" data-filter="live" aria-selected="false">Happening now</button>
+          <button type="button" class="tab-btn" role="tab" data-filter="upcoming" aria-selected="false">Upcoming</button>
+          <button type="button" class="tab-btn" role="tab" data-filter="past" aria-selected="false">Past</button>
+          <button type="button" class="tab-btn" role="tab" data-filter="draft" aria-selected="false">Drafts</button>
+          <button type="button" class="tab-btn" role="tab" data-filter="cancelled" aria-selected="false">Cancelled</button>
+        </div>
+
+        <div class="row">
+          <label class="sr-only" for="dash-search">Search events</label>
+          <input id="dash-search" class="input" type="search" placeholder="Search title or venue…" style="width:220px;">
+          <label class="sr-only" for="dash-sort">Sort events</label>
+          <select id="dash-sort" class="select" style="width:auto;">
+            <option value="newest">Start date (newest)</option>
+            <option value="oldest">Start date (oldest)</option>
+            <option value="most_registered">Most registered</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="dashboard-table-wrap" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <script type="module" src="/web/assets/js/pages/admin-dashboard.js"></script>
+</body>
+</html>

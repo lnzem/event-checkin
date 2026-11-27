@@ -1,147 +1,176 @@
-import { createClient } from '@supabase/supabase-js';
-import QRCode from 'qrcode';
-import { Resend } from 'resend';
+import { getServiceClient } from './_lib/supabase.js';
+import { sendError, methodNotAllowed } from './_lib/http.js';
+import { getAuthUser } from './_lib/auth.js';
+import { normalizeEmail, validateRegistrationInput } from './_lib/validation.js';
+import { generateTicketId, generateQrAssets } from './_lib/qr.js';
+import { checkRateLimit, getClientIp } from './_lib/rate-limit.js';
+import { sendTicketsEmail } from './_lib/email.js';
 
-/** @type {import('@vercel/node').VercelRequestHandler} */
-export default async function handler(req, res) {
-  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    console.error('Missing Supabase configuration: SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is not set');
-    res.status(500).json({ message: 'Server configuration error' });
-    return;
-  }
+const MAX_TICKET_RETRIES = 5;
 
-  if (req.method !== 'POST') {
-    res.status(405).json({ message: 'Method Not Allowed' });
-    return;
-  }
+async function verifyTurnstile(token, ip) {
+  const secret = process.env.TURNSTILE_SECRET?.trim();
+  if (!secret) return true;
+  if (!token || typeof token !== 'string') return false;
 
-  let supabaseUrl;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
   try {
-    supabaseUrl = new URL(process.env.SUPABASE_URL.trim()).origin;
+    const form = new URLSearchParams({
+      secret,
+      response: token,
+      remoteip: ip,
+    });
+    const resp = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      body: form,
+    });
+    if (!resp.ok) return false;
+    const data = await resp.json();
+    return Boolean(data.success);
   } catch {
-    console.error('Invalid SUPABASE_URL configuration');
-    res.status(500).json({ message: 'Server configuration error' });
-    return;
+    return false;
+  }
+}
+
+function mapRpcError(err) {
+  const msg = String(err?.message || '');
+  if (msg.includes('event_not_found')) return { status: 404, code: 'event_not_found', message: 'Event not found.' };
+  if (msg.includes('event_closed')) return { status: 403, code: 'event_closed', message: 'Registration for this event is closed.' };
+  if (msg.includes('event_full')) return { status: 409, code: 'event_full', message: 'This event is already full.' };
+  if (msg.includes('duplicate_registration')) {
+    return { status: 409, code: 'duplicate_registration', message: 'This email is already registered for this event.' };
+  }
+  if (msg.includes('ticket_collision')) return { status: 500, code: 'ticket_collision', message: 'Could not allocate ticket ID.' };
+  return null;
+}
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return methodNotAllowed(res, ['POST']);
   }
 
-  const supabase = createClient(supabaseUrl, supabaseKey);
-
-  const { full_name, email, organization, contact_number } = req.body ?? {};
-
-  // Basic validation
-  if (!full_name || !email || !organization || !contact_number) {
-    res.status(400).json({ message: 'Missing required fields' });
-    return;
-  }
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    res.status(400).json({ message: 'Invalid email format' });
-    return;
-  }
-  const phMobile = /^(?:09\d{9}|\+639\d{9})$/;
-  if (!phMobile.test(contact_number)) {
-    res.status(400).json({ message: 'Invalid PH mobile number' });
-    return;
+  const ip = getClientIp(req);
+  const rl = checkRateLimit(`register:ip:${ip}`, 5, 60_000);
+  if (!rl.allowed) {
+    res.setHeader('Retry-After', String(rl.retryAfterSeconds));
+    return sendError(res, 429, 'rate_limited', 'Too many attempts. Please wait a minute and try again.');
   }
 
-  // Duplicate email check
-  const { data: dup, error: dupErr } = await supabase
-    .from('registrations')
-    .select('id')
-    .eq('email', email)
-    .single();
+  const { valid, fields, data } = validateRegistrationInput(req.body);
+  if (!valid) {
+    return sendError(res, 422, 'validation_error', 'Please fix the highlighted fields.', fields);
+  }
 
-  if (dupErr && dupErr.code !== 'PGRST116') {
-    console.error('Database error during duplicate check:', {
-      code: dupErr.code,
-      message: dupErr.message,
-      details: dupErr.details,
-      hint: dupErr.hint
+  const turnstileOk = await verifyTurnstile(req.body?.turnstile_token, ip);
+  if (!turnstileOk) {
+    return sendError(res, 422, 'validation_error', 'Please complete the verification challenge.', {
+      captcha: 'Verification failed. Please try again.',
     });
-    res.status(500).json({ message: 'Database error' });
-    return;
-  }
-  if (dup) {
-    res
-      .status(409)
-      .json({ message: 'A registration with that email already exists' });
-    return;
   }
 
-  // Generate ticket ID
-  const ticket_id = `SEM-${Math.floor(100000 + Math.random() * 900000)}`;
-
-  // Insert registration
-  const { data: row, error: insertErr } = await supabase
-    .from('registrations')
-    .insert({
-      full_name,
-      email,
-      organization,
-      contact_number,
-      ticket_id,
-      qr_sent: false,
-      checked_in: false
-    })
-    .select('id, ticket_id, full_name, email, organization, contact_number, qr_sent, checked_in, checked_in_at')
-    .single();
-
-  if (insertErr) {
-    console.error('Database error during registration insert:', {
-      code: insertErr.code,
-      message: insertErr.message,
-      details: insertErr.details,
-      hint: insertErr.hint
-    });
-    res.status(500).json({ message: 'Failed to create registration' });
-    return;
+  let supabase;
+  try {
+    supabase = getServiceClient();
+  } catch (err) {
+    console.error('Supabase config error:', err.message);
+    return sendError(res, 500, 'server_error', 'Server configuration error.');
   }
 
-  // QR code (encode only ticket_id)
-  const qrDataUrl = await QRCode.toDataURL(ticket_id, {
-    width: 300,
-    margin: 2,
-    color: { dark: '#000000', light: '#FFFFFF' }
-  });
-
-  // Send confirmation email via Resend
-  const html = `
-    <html>
-      <body style="font-family:Inter,sans-serif;background:#0c0d10;color:#f8f8fa;padding:24px;">
-        <h1 style="font-size:27px;font-weight:700;margin:0;">Your registration is confirmed</h1>
-        <p style="font-size:13px;color:#a5a7b2;">Ticket ID: <strong>${ticket_id}</strong></p>
-        <img src="cid:qrcode" alt="QR code" style="display:block;margin:20px 0;width:244px;height:244px;border-radius:12px;background:#fff;">
-      </body>
-    </html>
-  `;
-
-  if (process.env.RESEND_API_KEY) {
-    try {
-      const resend = new Resend(process.env.RESEND_API_KEY);
-      await resend.emails.send({
-        from: 'onboarding@resend.dev',
-        to: email,
-        subject: 'Seminar Registration Confirmation',
-        html,
-        attachments: [
-          {
-            filename: 'qrcode.png',
-            content: qrDataUrl.split(',')[1],
-            disposition: 'inline',
-            contentId: 'qrcode'
-          }
-        ]
+  const authUser = await getAuthUser(req, supabase);
+  let userId = null;
+  if (authUser) {
+    if (data.email !== normalizeEmail(authUser.email)) {
+      return sendError(res, 422, 'validation_error', 'Please fix the highlighted fields.', {
+        email: 'Use the email of your account.',
       });
-      // Mark QR as sent
-      if (row?.id) {
-        await supabase.from('registrations').update({ qr_sent: true }).eq('id', row.id);
-      }
-    } catch (err) {
-      console.error('Resend email error:', err);
-      // Email failures are non‑fatal for the API response
+    }
+    userId = authUser.id;
+  }
+
+  let reg = null;
+  let lastMapped = null;
+
+  for (let attempt = 0; attempt < MAX_TICKET_RETRIES; attempt += 1) {
+    const ticketId = generateTicketId();
+    const { data: rpcData, error: rpcErr } = await supabase.rpc('register_for_event', {
+      p_event_id: data.event_id,
+      p_user_id: userId,
+      p_full_name: data.full_name,
+      p_email: data.email,
+      p_organization: data.organization,
+      p_contact_number: data.contact_number,
+      p_ticket_id: ticketId,
+    });
+
+    if (!rpcErr && rpcData) {
+      reg = Array.isArray(rpcData) ? rpcData[0] : rpcData;
+      break;
+    }
+
+    const mapped = mapRpcError(rpcErr);
+    if (!mapped) {
+      console.error('register_for_event failed:', rpcErr?.code, rpcErr?.message);
+      return sendError(res, 500, 'server_error', 'Failed to complete registration.');
+    }
+
+    lastMapped = mapped;
+    if (mapped.code !== 'ticket_collision') {
+      return sendError(res, mapped.status, mapped.code, mapped.message);
     }
   }
 
-  res.status(200).json({ ticket_id, full_name, qr_data_url: qrDataUrl });
+  if (!reg) {
+    return sendError(
+      res,
+      lastMapped?.status || 500,
+      lastMapped?.code || 'server_error',
+      lastMapped?.message || 'Failed to allocate ticket ID.'
+    );
+  }
+
+  const { data: eventRow, error: eventErr } = await supabase
+    .from('events')
+    .select('title, starts_at, ends_at, venue')
+    .eq('id', data.event_id)
+    .single();
+
+  if (eventErr || !eventRow) {
+    console.error('Failed to load event after registration:', eventErr?.message);
+    return sendError(res, 500, 'server_error', 'Registration created but event details could not be loaded.');
+  }
+
+  const { qrDataUrl, qrBuffer } = await generateQrAssets(reg.ticket_id);
+
+  let qrSent = false;
+  try {
+    const emailResult = await sendTicketsEmail({
+      to: reg.email,
+      attendeeName: reg.full_name,
+      tickets: [
+        {
+          ticket_id: reg.ticket_id,
+          full_name: reg.full_name,
+          qrBuffer,
+          event: eventRow,
+        },
+      ],
+    });
+    if (emailResult.sent) {
+      await supabase.from('registrations').update({ qr_sent: true }).eq('id', reg.id);
+      qrSent = true;
+    }
+  } catch (err) {
+    console.error('Resend email error (non-fatal):', err?.message || err);
+  }
+
+  return res.status(201).json({
+    ticket_id: reg.ticket_id,
+    full_name: reg.full_name,
+    qr_data_url: qrDataUrl,
+    qr_sent: qrSent,
+    event: {
+      title: eventRow.title,
+      starts_at: eventRow.starts_at,
+      venue: eventRow.venue,
+    },
+  });
 }
