@@ -183,6 +183,7 @@ begin
 end $$;
 
 revoke all on public.registrations from anon;
+grant select on public.registrations to authenticated;
 
 -- Logged-in users read only their own tickets
 create policy registrations_select_own on public.registrations
