@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Event Details — Event Check-In</title>
+  <meta name="description" content="View event details, schedule, venue, and register for your QR ticket.">
+  <meta property="og:title" content="Event Details — Event Check-In">
+  <meta property="og:description" content="View event details, schedule, venue, and register for your QR ticket.">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="/web/assets/css/main.css">
+  <style>
+    .cover-banner {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: linear-gradient(135deg, var(--accent-soft), var(--surface-subtle));
+      border: 1px solid var(--border);
+    }
+    @media (min-width: 768px) {
+      .cover-banner { aspect-ratio: 21 / 9; }
+    }
+    .event-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+      align-items: start;
+    }
+    .event-sidebar { order: -1; }
+    @media (min-width: 900px) {
+      .event-layout { grid-template-columns: minmax(0, 1fr) 340px; }
+      .event-sidebar { order: 0; position: sticky; top: 84px; }
+    }
+    .progress-track {
+      height: 8px;
+      background: var(--surface-subtle);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container stack-lg" style="padding-top:24px;padding-bottom:48px;">
+    <div>
+      <a href="/" class="muted" style="font-weight:500;">‹ All events</a>
+    </div>
+    <div id="event-root" aria-live="polite"></div>
+  </main>
+
+  <footer id="site-footer"></footer>
+
+  <script type="module" src="/web/assets/js/pages/event.js"></script>
+</body>
+</html>

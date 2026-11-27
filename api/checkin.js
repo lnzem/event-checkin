@@ -1,92 +1,83 @@
-import { createClient } from '@supabase/supabase-js';
+import { getServiceClient } from './_lib/supabase.js';
+import { sendError, methodNotAllowed } from './_lib/http.js';
+import { requireAdmin } from './_lib/auth.js';
+import { isValidUuid, normalizeTicketId } from './_lib/validation.js';
 
 export default async function handler(req, res) {
-  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    console.error('Missing Supabase configuration: SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is not set');
-    res.status(500).json({ message: 'Server configuration error' });
-    return;
-  }
-
   if (req.method !== 'POST') {
-    res.status(405).json({ message: 'Method Not Allowed' });
-    return;
+    return methodNotAllowed(res, ['POST']);
   }
 
-  let supabaseUrl;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  let supabase;
   try {
-    supabaseUrl = new URL(process.env.SUPABASE_URL.trim()).origin;
-  } catch {
-    console.error('Invalid SUPABASE_URL configuration');
-    res.status(500).json({ message: 'Server configuration error' });
-    return;
+    supabase = getServiceClient();
+  } catch (err) {
+    console.error('Supabase config error:', err.message);
+    return sendError(res, 500, 'server_error', 'Server configuration error.');
   }
 
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  const admin = await requireAdmin(req, res, supabase);
+  if (!admin) return;
 
-  const raw = req.body?.ticket_id;
-  const ticket_id = typeof raw === 'string' ? raw.trim().toUpperCase() : '';
+  const ticketId = normalizeTicketId(req.body?.ticket_id);
+  const eventId = typeof req.body?.event_id === 'string' ? req.body.event_id.trim() : '';
 
-  if (!ticket_id) {
-    res.status(400).json({ status: 'invalid', message: 'ticket_id is required' });
-    return;
+  const fields = {};
+  if (!ticketId) fields.ticket_id = 'Ticket ID is required.';
+  if (!isValidUuid(eventId)) fields.event_id = 'A valid event ID is required.';
+  if (Object.keys(fields).length > 0) {
+    return sendError(res, 422, 'validation_error', 'Invalid check-in request.', fields);
   }
 
-  const { data: row, error: lookupErr } = await supabase
+  const nowIso = new Date().toISOString();
+  const { data: updated, error: updateErr } = await supabase
     .from('registrations')
-    .select('id, ticket_id, full_name, organization, checked_in, checked_in_at')
-    .eq('ticket_id', ticket_id)
-    .single();
-
-  if (lookupErr && lookupErr.code === 'PGRST116') {
-    res.status(404).json({ status: 'not_found', message: 'Ticket ID not found' });
-    return;
-  }
-  if (lookupErr) {
-    console.error('Database error during ticket lookup:', {
-      code: lookupErr.code,
-      message: lookupErr.message,
-      details: lookupErr.details,
-      hint: lookupErr.hint
-    });
-    res.status(500).json({ status: 'error', message: 'Database error' });
-    return;
-  }
-
-  if (row.checked_in) {
-    res.status(200).json({
-      status: 'already_checked_in',
-      ticket_id: row.ticket_id,
-      full_name: row.full_name,
-      organization: row.organization,
-      checked_in_at: row.checked_in_at
-    });
-    return;
-  }
-
-  const checked_in_at = new Date().toISOString();
-
-  const { error: updateErr } = await supabase
-    .from('registrations')
-    .update({ checked_in: true, checked_in_at })
-    .eq('id', row.id);
+    .update({ checked_in: true, checked_in_at: nowIso })
+    .eq('ticket_id', ticketId)
+    .eq('event_id', eventId)
+    .eq('checked_in', false)
+    .select('ticket_id, full_name, organization, checked_in_at')
+    .maybeSingle();
 
   if (updateErr) {
-    console.error('Database error during checkin update:', {
-      code: updateErr.code,
-      message: updateErr.message,
-      details: updateErr.details,
-      hint: updateErr.hint
-    });
-    res.status(500).json({ status: 'error', message: 'Failed to update check-in' });
-    return;
+    console.error('checkin update error:', updateErr.code, updateErr.message);
+    return sendError(res, 500, 'server_error', 'Failed to update check-in.');
   }
 
-  res.status(200).json({
-    status: 'checked_in',
-    ticket_id: row.ticket_id,
-    full_name: row.full_name,
-    organization: row.organization,
-    checked_in_at
+  if (updated) {
+    return res.status(200).json({
+      status: 'checked_in',
+      ticket_id: updated.ticket_id,
+      full_name: updated.full_name,
+      organization: updated.organization,
+      checked_in_at: updated.checked_in_at,
+    });
+  }
+
+  const { data: existing, error: lookupErr } = await supabase
+    .from('registrations')
+    .select('event_id, ticket_id, full_name, organization, checked_in, checked_in_at')
+    .eq('ticket_id', ticketId)
+    .maybeSingle();
+
+  if (lookupErr) {
+    console.error('checkin lookup error:', lookupErr.code, lookupErr.message);
+    return sendError(res, 500, 'server_error', 'Database error.');
+  }
+
+  if (!existing) {
+    return sendError(res, 404, 'ticket_not_found', 'Ticket not found.');
+  }
+
+  if (existing.event_id !== eventId) {
+    return sendError(res, 409, 'wrong_event', 'Ticket is for a different event.');
+  }
+
+  return res.status(200).json({
+    status: 'already_checked_in',
+    ticket_id: existing.ticket_id,
+    full_name: existing.full_name,
+    organization: existing.organization,
+    checked_in_at: existing.checked_in_at,
   });
 }
