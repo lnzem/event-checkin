@@ -99,6 +99,7 @@ create index if not exists events_status_starts_idx on public.events (status, st
 
 alter table public.events enable row level security;
 revoke all on public.events from anon;
+grant select, insert, update, delete on public.events to authenticated;
 
 drop policy if exists events_admin_all on public.events;
 create policy events_admin_all on public.events
