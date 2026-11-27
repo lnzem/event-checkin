@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Event Editor — Event Check-In</title>
+  <link rel="stylesheet" href="/web/assets/css/main.css">
+  <style>
+    .editor-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+      align-items: start;
+    }
+    .preview-col {
+      display: none;
+    }
+    @media (min-width: 960px) {
+      .editor-grid {
+        grid-template-columns: minmax(0, 1fr) 360px;
+      }
+      .preview-col {
+        display: block;
+        position: sticky;
+        top: 84px;
+      }
+      .mobile-preview-btn {
+        display: none;
+      }
+    }
+    .dropzone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: var(--space-5);
+      text-align: center;
+      cursor: pointer;
+      background: var(--surface-subtle);
+    }
+    .dropzone.dragover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .sticky-bar {
+      position: sticky;
+      bottom: 0;
+      z-index: 20;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: var(--space-3) 0;
+      margin-top: var(--space-6);
+    }
+  </style>
+</head>
+<body>
+  <header id="admin-header"></header>
+
+  <main class="container stack-lg" style="padding-top:24px;padding-bottom:24px;">
+    <div class="row-between">
+      <div class="row">
+        <a href="/admin" id="back-link" class="muted" style="font-weight:500;">‹ Events</a>
+        <h1 id="page-title" style="margin:0;font-size:1.5rem;">New event</h1>
+        <span id="edit-status-chip"></span>
+      </div>
+      <button type="button" id="mobile-preview-btn" class="btn btn-secondary btn-sm mobile-preview-btn">Preview</button>
+    </div>
+
+    <div id="editor-root" aria-live="polite"></div>
+  </main>
+
+  <script type="module" src="/web/assets/js/pages/admin-event.js"></script>
+</body>
+</html>

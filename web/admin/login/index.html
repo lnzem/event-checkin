@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Staff Sign In — Event Check-In</title>
+  <link rel="stylesheet" href="/web/assets/css/main.css">
+  <style>
+    .admin-login-shell {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-6) var(--space-4);
+    }
+    .admin-login-card {
+      width: 100%;
+      max-width: 400px;
+    }
+    .pw-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .pw-wrap .input {
+      padding-right: 70px;
+    }
+    .pw-toggle {
+      position: absolute;
+      right: 6px;
+      min-height: 36px;
+      padding: 0 10px;
+      border: 0;
+      background: transparent;
+      color: var(--text-muted);
+      font: inherit;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <main class="admin-login-shell stack-lg">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">E</span>
+      <span>Event Check-In</span>
+    </div>
+
+    <section class="card admin-login-card stack">
+      <div class="stack-sm">
+        <h1 style="font-size:1.5rem;margin:0;">Staff sign in</h1>
+        <p class="muted" style="margin:0;font-size:0.9375rem;">Authorized personnel only.</p>
+      </div>
+
+      <div id="admin-login-error" aria-live="polite"></div>
+
+      <form id="admin-login-form" class="stack" novalidate>
+        <div class="field">
+          <label class="field-label" for="admin-email">Email</label>
+          <input id="admin-email" class="input" type="email" required autocomplete="email">
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="admin-password">Password</label>
+          <div class="pw-wrap">
+            <input id="admin-password" class="input" type="password" required autocomplete="current-password">
+            <button type="button" class="pw-toggle" id="pw-toggle" aria-label="Show password">Show</button>
+          </div>
+        </div>
+
+        <button type="submit" id="admin-signin-btn" class="btn btn-primary" style="width:100%;">Sign in</button>
+      </form>
+
+      <p class="muted" style="margin:0;font-size:0.8125rem;text-align:center;">Need access? Ask an organizer.</p>
+    </section>
+  </main>
+
+  <script type="module" src="/web/assets/js/pages/admin-login.js"></script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Tickets — Event Check-In</title>
+  <meta name="description" content="View your upcoming and past event tickets, QR codes, and profile details.">
+  <meta property="og:title" content="My Tickets — Event Check-In">
+  <meta property="og:description" content="View your upcoming and past event tickets, QR codes, and profile details.">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="/web/assets/css/main.css">
+  <style>
+    .ticket-card {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+    }
+    @media (min-width: 640px) {
+      .ticket-card {
+        grid-template-columns: 140px 1fr;
+        align-items: start;
+      }
+    }
+    .ticket-thumb {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: var(--radius-sm);
+      object-fit: cover;
+      background: linear-gradient(135deg, var(--accent-soft), var(--surface-subtle));
+    }
+    .qr-modal-box {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: var(--radius);
+      border: 1px solid #e2e8f0;
+      display: inline-flex;
+      justify-content: center;
+      margin: 0 auto;
+    }
+    .qr-modal-box canvas, .qr-modal-box img {
+      width: min(320px, 72vw);
+      height: min(320px, 72vw);
+      min-width: 240px;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container stack-lg" style="padding-top:32px;padding-bottom:48px;">
+    <div class="stack-sm">
+      <h1 style="margin:0;">My Tickets</h1>
+      <p id="tickets-subtitle" class="muted" style="margin:0;"></p>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Ticket categories">
+      <button type="button" class="tab-btn" role="tab" id="tab-upcoming" data-tab="upcoming" aria-selected="true">
+        Upcoming <span class="chip chip-muted" id="count-upcoming">0</span>
+      </button>
+      <button type="button" class="tab-btn" role="tab" id="tab-past" data-tab="past" aria-selected="false">
+        Past <span class="chip chip-muted" id="count-past">0</span>
+      </button>
+    </div>
+
+    <div id="tickets-panel" class="stack" aria-live="polite"></div>
+
+    <details class="card" id="my-details-panel">
+      <summary style="cursor:pointer;font-weight:600;font-size:1.0625rem;">My details</summary>
+      <form id="profile-form" class="stack" style="padding-top:16px;max-width:460px;" novalidate>
+        <div class="field">
+          <label class="field-label" for="prof-email">Email</label>
+          <input id="prof-email" class="input" type="email" readonly>
+        </div>
+        <div class="field">
+          <label class="field-label" for="prof-name">Full Name</label>
+          <input id="prof-name" class="input" type="text" required aria-describedby="prof-name-err">
+          <span id="prof-name-err" class="field-error" hidden></span>
+        </div>
+        <div class="field">
+          <label class="field-label" for="prof-org">Organization</label>
+          <input id="prof-org" class="input" type="text" required aria-describedby="prof-org-err">
+          <span id="prof-org-err" class="field-error" hidden></span>
+        </div>
+        <div class="field">
+          <label class="field-label" for="prof-phone">Contact Number</label>
+          <input id="prof-phone" class="input" type="tel" required aria-describedby="prof-phone-err">
+          <span id="prof-phone-err" class="field-error" hidden></span>
+        </div>
+        <div>
+          <button type="submit" id="prof-save-btn" class="btn btn-primary">Save details</button>
+        </div>
+      </form>
+    </details>
+  </main>
+
+  <footer id="site-footer"></footer>
+
+  <script type="module" src="/web/assets/js/pages/tickets.js"></script>
+</body>
+</html>
