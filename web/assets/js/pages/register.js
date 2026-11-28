@@ -375,7 +375,7 @@ async function init() {
     }
 
     currentEvent = ev;
-    document.title = `Register: ${ev.title} — Regismeow`;
+    document.title = 'Regismeow';
 
     if (!isRegistrationOpen(ev)) {
       renderUnavailable(ev);

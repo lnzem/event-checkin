@@ -49,7 +49,7 @@ function renderNotFound() {
 }
 
 function updateMeta(ev) {
-  document.title = `${ev.title} — Regismeow`;
+  document.title = 'Regismeow';
   const desc = (ev.description || '').slice(0, 155);
   const ogTitle = document.querySelector('meta[property="og:title"]');
   const ogDesc = document.querySelector('meta[property="og:description"]');
