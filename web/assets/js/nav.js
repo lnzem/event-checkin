@@ -45,9 +45,12 @@ export async function renderPublicNav({ active = '' } = {}) {
     headerMount.className = 'site-header';
     headerMount.innerHTML = `
       <div class="container site-header-inner">
-        <a class="brand" href="/" aria-label="Live home">
-          <span class="brand-mark" aria-hidden="true"><img src="/web/assets/icons/brand-radio.svg" alt=""></span>
-          <span class="brand-name">live</span>
+        <a class="brand" href="/" aria-label="Regismeow home">
+          <span class="brand-symbol" aria-hidden="true">
+            <img class="brand-badge" src="/web/assets/icons/regismeow-badge.svg" alt="">
+            <img class="brand-signal" src="/web/assets/icons/regismeow-signal.svg" alt="">
+          </span>
+          <span class="brand-name">regismeow</span>
         </a>
         <nav class="primary-nav" aria-label="Main navigation">
           <a class="nav-link" href="/"${activePage === 'home' ? ' aria-current="page"' : ''}><span class="nav-link-icon"><img src="/web/assets/icons/home.svg" alt=""></span>Home</a>

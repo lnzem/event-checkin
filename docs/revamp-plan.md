@@ -11,7 +11,7 @@
 - **Hosting & Backend:** Vercel static frontend (`/web`) + Vercel serverless functions (`/api`)
 - **Database:** Supabase (PostgreSQL)
 - **Email:** Resend (confirmation email with inline QR pass)
-- **Design System:** Shared `web/shared/tokens.css` using the Live identity (warm off-white canvas, white surfaces, charcoal text, orange accent, Inter font, responsive mobile and desktop layouts)
+- **Design System:** Shared `web/shared/tokens.css` using the Regismeow identity (warm off-white canvas, white surfaces, charcoal text, orange accent, Inter font, responsive mobile and desktop layouts)
 
 ### Routes
 | Route | Audience | Purpose |

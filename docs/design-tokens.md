@@ -1,10 +1,10 @@
 # Design tokens
 
-Source: supplied Figma mockups for the Live event discovery and registration experience. The implementation adapts those frames to the existing event registration and check-in features.
+Source: supplied Figma mockups for the Regismeow event discovery and registration experience. The implementation adapts those frames to the existing event registration and check-in features.
 
 ## Identity
 
-- Brand: Live
+- Brand: Regismeow
 - Style: clean, event-focused, responsive; light and dark themes
 - Type: Inter with system sans-serif fallbacks
 - Accent: warm orange, used for primary actions and active navigation
@@ -20,6 +20,7 @@ Source: supplied Figma mockups for the Live event discovery and registration exp
   --text-muted: #5f6672;
   --border: #e3e5e9;
   --accent: #f26b21;
+  --accent-strong: #b94a0d;
   --accent-hover: #d85618;
   --accent-soft: #fff0e9;
   --accent-contrast: #ffffff;

@@ -31,8 +31,11 @@ export async function initAdminPage({ active = 'events' } = {}) {
       <div class="container site-header-inner">
         <div class="row">
           <a class="brand" href="/admin">
-            <span class="brand-mark" aria-hidden="true"><img src="/web/assets/icons/brand-radio.svg" alt=""></span>
-            <span>live</span>
+            <span class="brand-symbol" aria-hidden="true">
+              <img class="brand-badge" src="/web/assets/icons/regismeow-badge.svg" alt="">
+              <img class="brand-signal" src="/web/assets/icons/regismeow-signal.svg" alt="">
+            </span>
+            <span class="brand-name">regismeow</span>
           </a>
           <span class="admin-badge">Admin</span>
         </div>
