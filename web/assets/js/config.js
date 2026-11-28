@@ -4,4 +4,4 @@ export const TIMEZONE = 'Asia/Manila';
 export const SHOW_STAFF_LINK = false;
 export const TURNSTILE_SITE_KEY = '';
 export const GOOGLE_LOGIN = false;
-export const SITE_NAME = 'Event Check-In';
+export const SITE_NAME = 'Live';

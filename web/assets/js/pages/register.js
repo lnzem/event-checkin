@@ -374,7 +374,7 @@ async function init() {
     }
 
     currentEvent = ev;
-    document.title = `Register: ${ev.title} — Event Check-In`;
+    document.title = `Register: ${ev.title} — Live`;
 
     if (!isRegistrationOpen(ev)) {
       renderUnavailable(ev);

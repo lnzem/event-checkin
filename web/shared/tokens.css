@@ -2,16 +2,16 @@
 
 :root {
   /* Color */
-  --color-bg: #0c0d10;
-  --color-surface: #1a1c22;
-  --color-text: #f8f8fa;
-  --color-text-muted: #a5a7b2;
-  --color-accent: #c7f36b;
-  --color-accent-ink: #10140b;
+  --color-bg: #fbfaf8;
+  --color-surface: #ffffff;
+  --color-text: #202124;
+  --color-text-muted: #626873;
+  --color-accent: #f26b21;
+  --color-accent-ink: #ffffff;
   --color-qr-bg: #ffffff;
   --color-qr-ink: #24262b;
   --color-qr-muted: #666b70;
-  --color-error: #ff6b6b;
+  --color-error: #bd3b36;
 
   /* Typography */
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -28,8 +28,8 @@
   /* Radius */
   --radius-card: 16px;
   --radius-pass: 18px;
-  --radius-field: 12px;
-  --radius-button: 14px;
+  --radius-field: 10px;
+  --radius-button: 999px;
   --radius-qr: 12px;
 
   /* Spacing */
@@ -62,3 +62,5 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
+
+button, input, select, textarea { font: inherit; }
