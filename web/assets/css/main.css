@@ -969,6 +969,62 @@ p {
   .site-footer { display: none; }
 }
 
+/* Keep dense controls usable on narrow phones and browser zoomed layouts. */
+@media (max-width: 719px) {
+  main, section, article, aside, form, .card, .stack, .row, .row-between,
+  .row > *, .row-between > * {
+    min-width: 0;
+  }
+
+  .table-wrap--cards .data-table td {
+    align-items: flex-start;
+    overflow-wrap: anywhere;
+  }
+
+  .table-wrap--cards .data-table td::before {
+    flex: 0 0 34%;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .table-wrap--cards .data-table td > * {
+    min-width: 0;
+    max-width: 66%;
+    overflow-wrap: anywhere;
+  }
+
+  .table-wrap--cards .data-table td[data-label="Actions"] > * {
+    max-width: 100%;
+  }
+
+  .row-actions { display: flex; flex-wrap: wrap; }
+  .attendee-identity { min-width: 0; flex: 1 1 0; }
+  .btn { min-width: 0; max-width: 100%; white-space: normal; line-height: 1.25; }
+}
+
+@media (max-width: 420px) {
+  .container { padding-inline: 12px; }
+  .card { padding: 16px; }
+  .mobile-bottom-nav { padding-inline: 6px; }
+  .mobile-bottom-nav a { min-width: 0; }
+  .mobile-bottom-nav a > span:last-child { max-width: 100%; overflow-wrap: anywhere; }
+  .toast-region { right: 8px; bottom: calc(8px + env(safe-area-inset-bottom)); width: calc(100vw - 16px); }
+}
+
+@media (max-width: 480px) {
+  .recent-item { flex-wrap: wrap; }
+  .recent-meta { flex-wrap: wrap; justify-content: flex-end; }
+}
+
+@media (max-width: 899px) {
+  .has-event-action .theme-toggle { bottom: calc(92px + env(safe-area-inset-bottom)); }
+}
+
+@media (max-width: 760px) {
+  body.has-mobile-nav:not(.focused-flow) .theme-toggle { bottom: calc(88px + env(safe-area-inset-bottom)); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   a.card:hover { transform: none; }
 }

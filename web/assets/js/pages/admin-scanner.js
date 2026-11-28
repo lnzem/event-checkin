@@ -452,7 +452,7 @@ function renderScannerUi() {
 
         <form id="manual-form" class="card stack-sm" novalidate>
           <label class="field-label" for="manual-ticket-input">Manual Ticket ID</label>
-          <div class="row" style="flex-wrap:nowrap;">
+          <div class="manual-ticket-controls">
             <input id="manual-ticket-input" class="input mono" type="text" placeholder="SEM-123456" autocomplete="off" style="min-height:56px;font-size:1.125rem;">
             <button type="submit" class="btn btn-primary scanner-btn">Check In</button>
           </div>

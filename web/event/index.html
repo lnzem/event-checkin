@@ -41,8 +41,8 @@
     .event-about h2, .event-details h2 { margin: 0; font-size: 1.125rem; }
     .event-about p { margin: 0; line-height: 1.65; }
     .event-details { gap: 12px; }
-    .event-details > div { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 12px; font-size: 0.875rem; }
-    .event-details > div span { color: var(--text-muted); }
+    .event-details > div { display: grid; grid-template-columns: minmax(88px, 120px) minmax(0, 1fr); gap: 12px; font-size: 0.875rem; }
+    .event-details > div span { min-width: 0; color: var(--text-muted); overflow-wrap: anywhere; }
     .event-primary-action { grid-area: action; }
     @media (min-width: 900px) {
       .event-layout {
