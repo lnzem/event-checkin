@@ -9,6 +9,34 @@ const nextPath = safeNext(params.get('next'), '/tickets');
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 let cooldownTimer = null;
+const RETRY_STORAGE_KEY = 'login_email_retry_after';
+let emailRetryAfter = Number(sessionStorage.getItem(RETRY_STORAGE_KEY)) || 0;
+
+function pauseEmailRetries() {
+  // Keep a failed rate-limit response from triggering another request every few seconds.
+  emailRetryAfter = Math.max(emailRetryAfter, Date.now() + 5 * 60_000);
+  sessionStorage.setItem(RETRY_STORAGE_KEY, String(emailRetryAfter));
+}
+
+function getEmailSendError(error) {
+  const code = String(error?.code || error?.errorCode || '');
+  const message = String(error?.message || '');
+  const status = Number(error?.status || 0);
+  console.warn('Supabase login email request failed', { code, status });
+
+  if (code === 'over_email_send_rate_limit' || /email rate limit exceeded/i.test(message)) {
+    pauseEmailRetries();
+    return 'Login email sending is temporarily limited. Please wait a few minutes before trying again. If it keeps happening, the site administrator needs to set up a dedicated email sender.';
+  }
+  if (code === 'email_address_not_authorized' || /email address not authorized/i.test(message)) {
+    return 'This site’s email sender is not set up for this address yet. Please contact the site administrator.';
+  }
+  if (status === 429) {
+    pauseEmailRetries();
+    return 'Too many login link requests. Please wait before trying again.';
+  }
+  return 'We couldn’t send the link. Please try again later.';
+}
 
 async function handleSignedIn() {
   const supabase = getSupabase();
@@ -24,6 +52,8 @@ async function handleSignedIn() {
 }
 
 function renderEmailStep(prefillEmail = '', errorBanner = '') {
+  if (cooldownTimer) window.clearInterval(cooldownTimer);
+  cooldownTimer = null;
   const googleHtml = GOOGLE_LOGIN
     ? `
       <button type="button" id="google-login-btn" class="btn btn-secondary" style="width:100%;">Continue with Google</button>
@@ -63,8 +93,25 @@ function renderEmailStep(prefillEmail = '', errorBanner = '') {
   const errEl = document.getElementById('login-email-err');
   const submitBtn = document.getElementById('send-link-btn');
 
+  function updateSendButton() {
+    const secondsLeft = Math.max(0, Math.ceil((emailRetryAfter - Date.now()) / 1000));
+    submitBtn.disabled = secondsLeft > 0;
+    submitBtn.textContent = secondsLeft > 0 ? `Try again in ${secondsLeft}s` : 'Send login link';
+    if (secondsLeft === 0) sessionStorage.removeItem(RETRY_STORAGE_KEY);
+    if (secondsLeft === 0 && cooldownTimer) {
+      window.clearInterval(cooldownTimer);
+      cooldownTimer = null;
+    }
+  }
+
+  updateSendButton();
+  if (emailRetryAfter > Date.now()) {
+    cooldownTimer = window.setInterval(updateSendButton, 1000);
+  }
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (Date.now() < emailRetryAfter) return;
     const email = emailInput.value.trim().toLowerCase();
     if (!EMAIL_RE.test(email)) {
       emailInput.setAttribute('aria-invalid', 'true');
@@ -88,21 +135,23 @@ function renderEmailStep(prefillEmail = '', errorBanner = '') {
         },
       });
       if (error) throw error;
+      emailRetryAfter = 0;
+      sessionStorage.removeItem(RETRY_STORAGE_KEY);
       renderCheckEmailStep(email);
-    } catch {
-      renderEmailStep(email, "We couldn't send the link. Please try again in a minute.");
+    } catch (error) {
+      renderEmailStep(email, getEmailSendError(error));
     }
   });
 }
 
-function renderCheckEmailStep(email) {
+function renderCheckEmailStep(email, errorBanner = '') {
   let secondsLeft = 60;
   content.innerHTML = `
     <div class="stack" style="text-align:center;">
       <div style="font-size:2rem;" aria-hidden="true">✉️</div>
       <h2 style="margin:0;font-size:1.25rem;">Check your email</h2>
       <p class="muted" style="margin:0;">We sent a login link to <strong>${escapeHtml(email)}</strong>.</p>
-      <div id="resend-msg" aria-live="polite"></div>
+      <div id="resend-msg" aria-live="polite">${errorBanner ? `<div class="banner banner-danger">${escapeHtml(errorBanner)}</div>` : ''}</div>
       <button type="button" id="resend-link-btn" class="btn btn-secondary" disabled style="width:100%;">Resend in 60s</button>
       <button type="button" id="diff-email-btn" class="btn btn-ghost btn-sm">Use a different email</button>
     </div>
@@ -138,10 +187,8 @@ function renderCheckEmailStep(email) {
       });
       if (error) throw error;
       renderCheckEmailStep(email);
-    } catch {
-      resendMsg.innerHTML = `<div class="banner banner-danger">We couldn’t send the link. Please try again in a minute.</div>`;
-      resendBtn.disabled = false;
-      resendBtn.textContent = 'Resend login link';
+    } catch (error) {
+      renderCheckEmailStep(email, getEmailSendError(error));
     }
   });
 
