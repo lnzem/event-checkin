@@ -183,7 +183,7 @@ function renderTickets() {
               ${statusChip}
             </div>
             <div class="muted" style="font-size:0.875rem;">${escapeHtml(formatEventDate(ev.starts_at, ev.ends_at))}</div>
-            <div class="muted" style="font-size:0.875rem;">📍 ${escapeHtml(ev.venue || 'Venue TBA')}</div>
+            <div class="muted" style="font-size:0.875rem;">${escapeHtml(ev.venue || 'Venue TBA')}</div>
             <div class="row" style="gap:8px;">
               <span class="mono" style="font-weight:700;">${escapeHtml(t.ticket_id)}</span>
               <button type="button" class="btn btn-ghost btn-sm" data-action="copy-id" data-ticket="${escapeHtml(t.ticket_id)}">Copy</button>

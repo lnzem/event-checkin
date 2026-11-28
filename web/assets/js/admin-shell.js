@@ -1,4 +1,3 @@
-import { SITE_NAME } from './config.js';
 import { getSupabase } from './supabase-client.js';
 import { requireAdmin, signOut } from './auth.js';
 import { setUnauthorizedHandler } from './api.js';
@@ -32,8 +31,8 @@ export async function initAdminPage({ active = 'events' } = {}) {
       <div class="container site-header-inner">
         <div class="row">
           <a class="brand" href="/admin">
-            <span class="brand-mark" aria-hidden="true">E</span>
-            <span>${escapeHtml(SITE_NAME)}</span>
+            <span class="brand-mark" aria-hidden="true"><img src="/web/assets/icons/brand-radio.svg" alt=""></span>
+            <span>live</span>
           </a>
           <span class="admin-badge">Admin</span>
         </div>

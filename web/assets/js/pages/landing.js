@@ -256,7 +256,7 @@ searchInput.addEventListener('input', () => {
 
 document.getElementById('find-ticket-btn')?.addEventListener('click', openFindTicketModal);
 
-renderPublicNav({ active: 'events' });
+  renderPublicNav();
 loadEvents();
 window.setInterval(() => {
   if (allEvents.length > 0) renderPanel();

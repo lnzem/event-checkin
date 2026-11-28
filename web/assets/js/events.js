@@ -92,7 +92,6 @@ export function renderEventCard(event, { now = new Date(), preview = false } = {
   const badge = getPhaseBadge(phase);
   const left = spotsLeft(event);
   const capacity = Number(event.capacity || 0);
-  const isPastOrCancelled = phase === 'past' || phase === 'cancelled';
   const isOpen = isRegistrationOpen(event, now);
 
   let availabilityText = '';
@@ -109,47 +108,39 @@ export function renderEventCard(event, { now = new Date(), preview = false } = {
   }
 
   const { month, day } = getMonthDayManila(event.starts_at);
+  const shortDate = event.starts_at
+    ? new Intl.DateTimeFormat('en-US', {
+        timeZone: TIMEZONE,
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      }).format(new Date(event.starts_at))
+    : 'Date to be announced';
   const coverHtml = event.cover_image_url
-    ? `<img src="${escapeHtml(event.cover_image_url)}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;">`
-    : `<div style="width:100%;height:100%;background:linear-gradient(135deg,var(--accent-soft),var(--surface-subtle));"></div>`;
-
-  let ctaHtml = '';
-  if (isOpen) {
-    ctaHtml = `<span class="btn btn-primary btn-sm" style="width:100%;">Register</span>`;
-  } else if (!isPastOrCancelled && left <= 0) {
-    ctaHtml = `<span class="btn btn-secondary btn-sm" aria-disabled="true" style="width:100%;">Full</span>`;
-  } else {
-    ctaHtml = `<span class="btn btn-secondary btn-sm" style="width:100%;">View details</span>`;
-  }
+    ? `<img src="${escapeHtml(event.cover_image_url)}" alt="" loading="lazy">`
+    : '';
 
   const href = preview ? '#' : `/event?id=${encodeURIComponent(event.id)}`;
-  const mutedStyle = phase === 'past' ? 'opacity:0.78;' : '';
 
   return `
-    <a href="${href}" class="card stack-sm" style="padding:0;overflow:hidden;color:inherit;text-decoration:none;display:flex;flex-direction:column;${mutedStyle}"${preview ? ' onclick="return false;"' : ''}>
-      <div style="position:relative;aspect-ratio:16/9;overflow:hidden;background:var(--surface-subtle);">
+    <a href="${href}" class="event-card"${phase === 'past' ? ' data-event-past="true"' : ''}${preview ? ' onclick="return false;"' : ''}>
+      <div class="event-cover">
         ${coverHtml}
-        <div style="position:absolute;top:12px;left:12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:4px 10px;text-align:center;line-height:1.1;box-shadow:var(--shadow);">
-          <div style="font-size:0.6875rem;font-weight:700;color:var(--accent);">${escapeHtml(month)}</div>
-          <div style="font-size:1rem;font-weight:700;color:var(--text);">${escapeHtml(day)}</div>
-        </div>
+        <span class="event-date-badge"><span>${escapeHtml(month)}</span><strong>${escapeHtml(day)}</strong></span>
       </div>
-      <div class="stack-sm" style="padding:16px;flex:1;justify-content:space-between;">
-        <div class="stack-sm">
-          <div class="row-between">
-            <span class="chip ${badge.cls}">${escapeHtml(badge.label)}</span>
-            <span class="muted" style="font-size:0.8125rem;font-weight:500;">${escapeHtml(availabilityText)}</span>
-          </div>
-          <h3 style="margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${escapeHtml(event.title || 'Untitled event')}</h3>
-          <p class="muted" style="margin:0;font-size:0.875rem;">
-            <span aria-hidden="true">📍</span> ${escapeHtml(event.venue || 'Venue TBA')}
-          </p>
-          <p class="muted" style="margin:0;font-size:0.875rem;">
-            ${escapeHtml(formatEventDate(event.starts_at, event.ends_at))}
-          </p>
+      <div class="event-card-body">
+        <p class="event-date">${escapeHtml(shortDate)}</p>
+        <div class="event-card-title-row">
+          <h3>${escapeHtml(event.title || 'Untitled event')}</h3>
+          <span class="chip ${badge.cls}">${escapeHtml(badge.label)}</span>
         </div>
-        <div style="padding-top:8px;">
-          ${ctaHtml}
+        <p class="event-venue">${escapeHtml(event.venue || 'Venue TBA')}</p>
+        <div class="event-card-footer">
+          <span class="event-availability">${escapeHtml(availabilityText)}</span>
+          <span class="event-card-link">${isOpen ? 'View event' : 'View details'} <span aria-hidden="true">→</span></span>
         </div>
       </div>
     </a>

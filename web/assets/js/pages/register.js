@@ -45,7 +45,7 @@ function renderUnavailable(ev) {
 function setFieldError(input, errEl, msg) {
   if (msg) {
     input.setAttribute('aria-invalid', 'true');
-    errEl.textContent = `! ${msg}`;
+    errEl.textContent = msg;
     errEl.hidden = false;
   } else {
     input.removeAttribute('aria-invalid');
@@ -115,7 +115,7 @@ function renderForm() {
     ${loginHintHtml}
 
     <section id="form-section" class="card stack">
-      <h2 style="margin:0;font-size:1.25rem;">Attendee registration</h2>
+        <h2 style="margin:0;font-size:1.25rem;">Register for this event</h2>
       <div id="form-banner" aria-live="polite"></div>
 
       <form id="register-form" class="stack" novalidate>
@@ -150,7 +150,7 @@ function renderForm() {
       </form>
     </section>
 
-    <section id="success-section" class="card stack success-animate" hidden></section>
+    <section id="success-section" class="card stack" hidden></section>
   `;
 
   document.getElementById('dismiss-login-hint')?.addEventListener('click', () => {
@@ -350,6 +350,7 @@ function renderForm() {
 }
 
 async function init() {
+  document.body.classList.add('focused-flow');
   renderPublicNav();
 
   if (!UUID_RE.test(eventId)) {

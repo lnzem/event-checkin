@@ -12,25 +12,57 @@
   <style>
     .cover-banner {
       width: 100%;
-      aspect-ratio: 16 / 9;
-      border-radius: var(--radius);
+      aspect-ratio: 1.8 / 1;
+      border-radius: 12px;
       overflow: hidden;
-      background: linear-gradient(135deg, var(--accent-soft), var(--surface-subtle));
-      border: 1px solid var(--border);
+      background: #e8f3ef;
     }
-    @media (min-width: 768px) {
-      .cover-banner { aspect-ratio: 21 / 9; }
+    .cover-banner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
     .event-layout {
       display: grid;
-      grid-template-columns: 1fr;
-      gap: var(--space-6);
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: "cover" "sidebar" "content";
+      gap: 20px;
       align-items: start;
     }
-    .event-sidebar { order: -1; }
+    .cover-banner { grid-area: cover; }
+    .event-sidebar { grid-area: sidebar; background: #f7f7f8; border: 0; }
+    .event-sidebar h1 { margin: 0; font-size: 1.5rem; line-height: 1.25; }
+    .event-meta { color: var(--text-muted); font-size: 0.875rem; }
+    .event-meta span { color: var(--text-muted); }
+    .event-capacity { font-size: 0.8125rem; }
+    .event-secondary-actions { margin-top: 2px; }
+    .event-content { grid-area: content; gap: 24px; }
+    .event-about h2, .event-details h2 { margin: 0; font-size: 1.125rem; }
+    .event-about p { margin: 0; line-height: 1.65; }
+    .event-details { gap: 12px; }
+    .event-details > div { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 12px; font-size: 0.875rem; }
+    .event-details > div span { color: var(--text-muted); }
+    .event-primary-action { grid-area: action; }
     @media (min-width: 900px) {
-      .event-layout { grid-template-columns: minmax(0, 1fr) 340px; }
-      .event-sidebar { order: 0; position: sticky; top: 84px; }
+      .event-layout {
+        grid-template-columns: minmax(0, 1.45fr) minmax(300px, 1fr);
+        grid-template-areas: "cover sidebar" "content sidebar";
+      }
+      .event-sidebar { position: sticky; top: 84px; }
+    }
+    @media (max-width: 899px) {
+      .cover-banner { aspect-ratio: 1.1 / 1; }
+      .event-primary-action {
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 45;
+        padding: 12px 24px calc(12px + env(safe-area-inset-bottom));
+        border-top: 1px solid var(--border);
+        background: #fff;
+      }
+      .has-event-action.has-mobile-nav { padding-bottom: 154px; }
     }
     .progress-track {
       height: 8px;

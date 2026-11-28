@@ -13,40 +13,77 @@ export async function renderPublicNav({ active = '' } = {}) {
     session = null;
   }
 
+  const path = window.location.pathname;
+  const activePage = active || (
+    path === '/tickets'
+      ? 'tickets'
+      : path === '/' && window.location.hash !== '#events'
+        ? 'home'
+        : 'events'
+  );
+  const ticketsHref = session ? '/tickets' : '/login?next=%2Ftickets';
+  const profileHref = session ? '/tickets#my-details-panel' : '/login';
+
   if (headerMount) {
     const email = session?.user?.email || '';
-    const initial = email ? email.charAt(0).toUpperCase() : 'U';
-
     const authHtml = session
       ? `
-        <a class="nav-link" href="/tickets"${active === 'tickets' ? ' aria-current="page"' : ''}>My Tickets</a>
         <div class="avatar-menu">
           <button type="button" class="avatar-btn" aria-expanded="false" aria-haspopup="menu" aria-label="Account menu">
-            <span class="avatar-circle">${escapeHtml(initial)}</span>
-            <span class="sr-only">Account menu</span>
+            <span class="avatar-circle"><img src="/web/assets/icons/user.svg" alt=""></span>
           </button>
           <div class="dropdown-menu" role="menu" hidden>
-            <div class="muted" style="padding:6px 12px;font-size:0.8125rem;word-break:break-all;">${escapeHtml(email)}</div>
-            <a class="dropdown-item" href="/tickets" role="menuitem">My Tickets</a>
+            <div class="muted account-email">${escapeHtml(email)}</div>
+            <a class="dropdown-item" href="${profileHref}" role="menuitem">My details</a>
+            <a class="dropdown-item" href="/tickets" role="menuitem">My tickets</a>
             <button type="button" class="dropdown-item" data-action="logout" role="menuitem">Log out</button>
           </div>
         </div>
       `
-      : `<a class="btn btn-secondary btn-sm" href="/login">Log in</a>`;
+      : `<a class="nav-link nav-profile-link" href="/login"><span class="nav-link-icon"><img src="/web/assets/icons/user.svg" alt=""></span>Log in</a>`;
 
     headerMount.className = 'site-header';
     headerMount.innerHTML = `
       <div class="container site-header-inner">
-        <a class="brand" href="/">
-          <span class="brand-mark" aria-hidden="true">E</span>
-          <span>${escapeHtml(SITE_NAME)}</span>
+        <a class="brand" href="/" aria-label="Live home">
+          <span class="brand-mark" aria-hidden="true"><img src="/web/assets/icons/brand-radio.svg" alt=""></span>
+          <span class="brand-name">live</span>
         </a>
-        <nav class="nav-actions" aria-label="Main navigation">
-          <a class="nav-link" href="/#events"${active === 'events' ? ' aria-current="page"' : ''}>Events</a>
-          ${authHtml}
+        <nav class="primary-nav" aria-label="Main navigation">
+          <a class="nav-link" href="/"${activePage === 'home' ? ' aria-current="page"' : ''}><span class="nav-link-icon"><img src="/web/assets/icons/home.svg" alt=""></span>Home</a>
+          <a class="nav-link" href="/#events"${activePage === 'events' ? ' aria-current="page"' : ''}><span class="nav-link-icon"><img src="/web/assets/icons/search.svg" alt=""></span>Explore</a>
+          <a class="nav-link" href="${ticketsHref}"${activePage === 'tickets' ? ' aria-current="page"' : ''}><span class="nav-link-icon"><img src="/web/assets/icons/bell.svg" alt=""></span>My tickets</a>
         </nav>
+        <div class="nav-actions">${authHtml}</div>
+        <a class="mobile-profile-link" href="${profileHref}" aria-label="Profile">
+          <img src="/web/assets/icons/user.svg" alt="">
+        </a>
       </div>
     `;
+
+    let mobileNav = document.getElementById('mobile-bottom-nav');
+    if (!mobileNav) {
+      mobileNav = document.createElement('nav');
+      mobileNav.id = 'mobile-bottom-nav';
+      mobileNav.className = 'mobile-bottom-nav';
+      mobileNav.setAttribute('aria-label', 'Main navigation');
+      document.body.appendChild(mobileNav);
+    }
+    mobileNav.innerHTML = `
+      <a href="/"${activePage === 'home' ? ' aria-current="page"' : ''}>
+        <span class="mobile-nav-icon"><img src="/web/assets/icons/home.svg" alt=""></span><span>Home</span>
+      </a>
+      <a href="/#events"${activePage === 'events' ? ' aria-current="page"' : ''}>
+        <span class="mobile-nav-icon"><img src="/web/assets/icons/search.svg" alt=""></span><span>Explore</span>
+      </a>
+      <a href="${ticketsHref}"${activePage === 'tickets' ? ' aria-current="page"' : ''}>
+        <span class="mobile-nav-icon"><img src="/web/assets/icons/bell.svg" alt=""></span><span>Tickets</span>
+      </a>
+      <a href="${profileHref}">
+        <span class="mobile-nav-icon"><img src="/web/assets/icons/user.svg" alt=""></span><span>Profile</span>
+      </a>
+    `;
+    document.body.classList.add('has-mobile-nav');
 
     const avatarBtn = headerMount.querySelector('.avatar-btn');
     const menu = headerMount.querySelector('.dropdown-menu');
@@ -73,7 +110,7 @@ export async function renderPublicNav({ active = '' } = {}) {
   if (footerMount) {
     const year = new Date().getFullYear();
     const staffLink = SHOW_STAFF_LINK
-      ? `<a class="muted" href="/admin/login" style="font-size:0.8125rem;">Staff</a>`
+      ? `<a class="muted" href="/admin/login">Staff</a>`
       : '';
     footerMount.className = 'site-footer';
     footerMount.innerHTML = `

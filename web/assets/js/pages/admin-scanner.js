@@ -209,7 +209,7 @@ function showResultCard(result, retryPayload = null) {
     cls = 'result-success';
     html = `
       <div class="stack-sm">
-        <div style="font-weight:700;color:var(--success);font-size:1.125rem;">✓ Checked in</div>
+        <div style="font-weight:700;color:var(--success);font-size:1.125rem;">Checked in</div>
         <div style="font-size:1.75rem;font-weight:700;line-height:1.2;">${escapeHtml(result.full_name)}</div>
         <div class="muted">${escapeHtml(result.organization || '')}</div>
         <div class="row-between">
@@ -222,7 +222,7 @@ function showResultCard(result, retryPayload = null) {
     cls = 'result-warning';
     html = `
       <div class="stack-sm">
-        <div style="font-weight:700;color:var(--warning);font-size:1.125rem;">! Already checked in</div>
+        <div style="font-weight:700;color:var(--warning);font-size:1.125rem;">Already checked in</div>
         <div style="font-size:1.5rem;font-weight:700;line-height:1.2;">${escapeHtml(result.full_name)}</div>
         <div class="muted">${escapeHtml(result.organization || '')}</div>
         <div class="row-between">
@@ -234,21 +234,21 @@ function showResultCard(result, retryPayload = null) {
   } else if (result.kind === 'wrong_event') {
     html = `
       <div class="stack-sm">
-        <div style="font-weight:700;color:var(--danger);font-size:1.125rem;">✕ Ticket is for a different event</div>
+        <div style="font-weight:700;color:var(--danger);font-size:1.125rem;">Ticket is for a different event</div>
         <div class="mono" style="font-weight:700;">${escapeHtml(result.ticket_id)}</div>
       </div>
     `;
   } else if (result.kind === 'ticket_not_found') {
     html = `
       <div class="stack-sm">
-        <div style="font-weight:700;color:var(--danger);font-size:1.125rem;">✕ Ticket not found</div>
+        <div style="font-weight:700;color:var(--danger);font-size:1.125rem;">Ticket not found</div>
         <div class="muted">Check the Ticket ID (${escapeHtml(result.ticket_id)}) or try manual entry.</div>
       </div>
     `;
   } else {
     html = `
       <div class="stack-sm">
-        <div style="font-weight:700;color:var(--danger);font-size:1.125rem;">✕ Couldn’t reach the server</div>
+        <div style="font-weight:700;color:var(--danger);font-size:1.125rem;">Couldn’t reach the server</div>
         <div><button type="button" class="btn btn-danger btn-sm" id="retry-checkin-btn">Retry</button></div>
       </div>
     `;
@@ -276,12 +276,18 @@ function pushRecent(result) {
   if (!list) return;
   list.innerHTML = recentScans
     .map((item, idx) => {
-      const icon = item.kind === 'checked_in' ? '✓' : item.kind === 'already_checked_in' ? '!' : '✕';
+      const status = item.kind === 'checked_in'
+        ? 'Checked in'
+        : item.kind === 'already_checked_in'
+          ? 'Already checked in'
+          : item.kind === 'ticket_not_found'
+            ? 'Ticket not found'
+            : 'Check failed';
       const label = item.full_name || item.ticket_id;
       return `
         <button type="button" class="recent-item" data-recent-idx="${idx}">
-          <span><strong>${escapeHtml(icon)}</strong> ${escapeHtml(label)} <span class="mono muted" style="font-size:0.8125rem;">${escapeHtml(item.ticket_id)}</span></span>
-          <span class="muted" style="font-size:0.75rem;">${escapeHtml(formatTime(item.scannedAt))}</span>
+          <span><strong>${escapeHtml(label)}</strong> <span class="mono muted" style="font-size:0.8125rem;">${escapeHtml(item.ticket_id)}</span></span>
+          <span class="recent-meta"><span class="muted" style="font-size:0.75rem;">${escapeHtml(formatTime(item.scannedAt))}</span><span class="chip chip-muted">${escapeHtml(status)}</span></span>
         </button>
       `;
     })

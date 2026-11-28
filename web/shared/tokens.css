@@ -2,10 +2,10 @@
 
 :root {
   /* Color */
-  --color-bg: #fbfaf8;
+  --color-bg: #ffffff;
   --color-surface: #ffffff;
-  --color-text: #202124;
-  --color-text-muted: #626873;
+  --color-text: #0f1115;
+  --color-text-muted: #5f6672;
   --color-accent: #f26b21;
   --color-accent-ink: #ffffff;
   --color-qr-bg: #ffffff;
@@ -26,10 +26,10 @@
   --fs-eyebrow: 11px;
 
   /* Radius */
-  --radius-card: 16px;
+  --radius-card: 12px;
   --radius-pass: 18px;
   --radius-field: 10px;
-  --radius-button: 999px;
+  --radius-button: 10px;
   --radius-qr: 12px;
 
   /* Spacing */

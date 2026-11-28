@@ -67,6 +67,7 @@ function updateMeta(ev) {
 
 function renderEvent() {
   const ev = currentEvent;
+  document.body.classList.add('focused-flow');
   const now = new Date();
   const phase = getEventPhase(ev, now);
   const badge = getPhaseBadge(phase);
@@ -120,60 +121,47 @@ function renderEvent() {
     : '';
 
   root.innerHTML = `
-    <div class="stack-lg">
+    <div class="event-layout">
       <div class="cover-banner">${coverHtml}</div>
 
-      <div class="event-layout">
-        <div class="stack-lg">
-          <div class="stack-sm">
-            <div><span class="chip ${badge.cls}">${escapeHtml(badge.label)}</span></div>
-            <h1 style="margin:0;">${escapeHtml(ev.title)}</h1>
+      <aside class="card stack event-sidebar">
+        <div><span class="chip ${badge.cls}">${escapeHtml(badge.label)}</span></div>
+        <h1>${escapeHtml(ev.title)}</h1>
+        <div class="event-meta">${escapeHtml(formattedDate)} <span>Asia/Manila</span></div>
+        <div class="event-meta">${escapeHtml(ev.venue || 'Venue TBA')}</div>
+
+        <div class="event-capacity stack-sm">
+          <div class="row-between">
+            <span>${escapeHtml(String(taken))} of ${escapeHtml(String(capacity))} spots taken</span>
+            <span class="muted">${escapeHtml(String(left))} left</span>
           </div>
-
-          <section class="card stack-sm">
-            <h2 style="font-size:1.25rem;margin:0;">About this event</h2>
-            <p style="margin:0;line-height:1.65;">${descriptionHtml}</p>
-          </section>
-
-          <section class="card stack">
-            <h2 style="font-size:1.25rem;margin:0;">Details</h2>
-            <div class="stack-sm">
-              <div><strong>Date &amp; Time:</strong> <span class="muted">${escapeHtml(formattedDate)} (Asia/Manila)</span></div>
-              <div><strong>Venue:</strong> <span class="muted">${escapeHtml(ev.venue || 'TBA')}</span></div>
-              <div><strong>Capacity:</strong> <span class="muted">${escapeHtml(String(capacity))} spots (${escapeHtml(String(left))} left)</span></div>
-            </div>
-            <div class="row">
-              <button type="button" class="btn btn-secondary btn-sm" id="add-calendar-btn">Add to calendar</button>
-              <button type="button" class="btn btn-secondary btn-sm" id="copy-link-btn">Copy link</button>
-            </div>
-          </section>
-
-          ${locationHtml}
+          <div class="progress-track" aria-hidden="true">
+            <div class="progress-fill" style="width:${pct}%;"></div>
+          </div>
         </div>
 
-        <aside class="card stack event-sidebar">
-          <div class="stack-sm">
-            <div style="font-weight:600;">${escapeHtml(formattedDate)}</div>
-            <div class="muted" style="font-size:0.9375rem;">📍 ${escapeHtml(ev.venue || 'Venue TBA')}</div>
-          </div>
+        <div class="row event-secondary-actions">
+          <button type="button" class="btn btn-secondary btn-sm" id="add-calendar-btn">Add to calendar</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="copy-link-btn">Copy link</button>
+        </div>
 
-          <div class="stack-sm">
-            <div class="row-between" style="font-size:0.875rem;">
-              <span>${escapeHtml(String(taken))} of ${escapeHtml(String(capacity))} spots taken</span>
-              <span class="muted">${escapeHtml(String(left))} left</span>
-            </div>
-            <div class="progress-track" aria-hidden="true">
-              <div class="progress-fill" style="width:${pct}%;"></div>
-            </div>
-          </div>
+        <div class="event-primary-action">${ctaBlock}</div>
+      </aside>
 
-          ${ctaBlock}
+      <div class="event-content stack-lg">
+        <section class="event-about stack-sm">
+          <h2>About this event</h2>
+          <p>${descriptionHtml}</p>
+        </section>
 
-          <div class="row">
-            <button type="button" class="btn btn-ghost btn-sm" id="sidebar-calendar-btn" style="flex:1;">Add to calendar</button>
-            <button type="button" class="btn btn-ghost btn-sm" id="sidebar-copy-btn" style="flex:1;">Copy link</button>
-          </div>
-        </aside>
+        <section class="event-details card stack-sm">
+          <h2>Event details</h2>
+          <div><strong>Date &amp; time</strong><span>${escapeHtml(formattedDate)} (Asia/Manila)</span></div>
+          <div><strong>Venue</strong><span>${escapeHtml(ev.venue || 'Venue TBA')}</span></div>
+          <div><strong>Capacity</strong><span>${escapeHtml(String(capacity))} spots · ${escapeHtml(String(left))} available</span></div>
+        </section>
+
+        ${locationHtml}
       </div>
     </div>
   `;
@@ -189,9 +177,8 @@ function renderEvent() {
   };
 
   document.getElementById('add-calendar-btn')?.addEventListener('click', onCalendar);
-  document.getElementById('sidebar-calendar-btn')?.addEventListener('click', onCalendar);
   document.getElementById('copy-link-btn')?.addEventListener('click', onCopy);
-  document.getElementById('sidebar-copy-btn')?.addEventListener('click', onCopy);
+  document.body.classList.add('has-event-action');
 }
 
 async function loadEvent(showSkeleton = true) {
@@ -250,6 +237,7 @@ async function loadEvent(showSkeleton = true) {
 }
 
 renderPublicNav();
+document.body.classList.add('focused-flow');
 loadEvent(true);
 window.setInterval(() => {
   if (currentEvent && document.visibilityState === 'visible') {
