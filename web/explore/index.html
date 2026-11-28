@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Events — Live</title>
+  <meta name="description" content="Browse seminars and events, register, and keep your QR ticket in one place.">
+  <meta property="og:title" content="Events — Live">
+  <meta property="og:description" content="Browse seminars and events, register, and keep your QR ticket in one place.">
+  <meta property="og:type" content="website">
+  <script src="/web/assets/js/theme-init.js"></script>
+  <link rel="stylesheet" href="/web/assets/css/main.css">
+  <style>
+    .events-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px 18px;
+    }
+    @media (min-width: 680px) {
+      .events-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (min-width: 1024px) {
+      .events-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main>
+    <section id="events" class="container event-browser">
+      <div class="page-heading row-between">
+        <div>
+          <h1>Explore events</h1>
+          <p class="muted">Seminars, talks, and workshops.</p>
+        </div>
+        <button type="button" id="find-ticket-btn" class="btn btn-secondary">Find my ticket</button>
+      </div>
+
+      <div class="event-browser-toolbar">
+        <div class="tabs" role="tablist" aria-label="Event categories" id="event-tabs">
+          <button type="button" class="tab-btn" role="tab" id="tab-live" data-tab="live" aria-selected="false" aria-controls="events-panel">
+            Happening now <span class="chip chip-muted" id="count-live">0</span>
+          </button>
+          <button type="button" class="tab-btn" role="tab" id="tab-upcoming" data-tab="upcoming" aria-selected="true" aria-controls="events-panel">
+            Upcoming <span class="chip chip-muted" id="count-upcoming">0</span>
+          </button>
+          <button type="button" class="tab-btn" role="tab" id="tab-past" data-tab="past" aria-selected="false" aria-controls="events-panel">
+            Past <span class="chip chip-muted" id="count-past">0</span>
+          </button>
+        </div>
+
+        <div class="event-search-wrap">
+          <label class="sr-only" for="event-search">Search events by title or venue</label>
+          <input id="event-search" class="input" type="search" placeholder="Search events">
+        </div>
+      </div>
+
+      <div id="events-panel" role="tabpanel" aria-live="polite" class="stack"></div>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+
+  <script type="module" src="/web/assets/js/pages/landing.js"></script>
+  <script type="module" src="/web/assets/js/theme.js"></script>
+</body>
+</html>

@@ -3,66 +3,57 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Events — Live</title>
-  <meta name="description" content="Browse seminars and events, register, and keep your QR ticket in one place.">
-  <meta property="og:title" content="Events — Live">
-  <meta property="og:description" content="Browse seminars and events, register, and keep your QR ticket in one place.">
+  <title>Home — Live</title>
+  <meta name="description" content="Find upcoming seminars, talks, and workshops with Live.">
+  <meta property="og:title" content="Home — Live">
+  <meta property="og:description" content="Find upcoming seminars, talks, and workshops with Live.">
   <meta property="og:type" content="website">
   <script src="/web/assets/js/theme-init.js"></script>
   <link rel="stylesheet" href="/web/assets/css/main.css">
   <style>
-    .events-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 24px 18px;
-    }
-    @media (min-width: 680px) {
-      .events-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-    @media (min-width: 1024px) {
-      .events-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .home-page { padding-top: 40px; padding-bottom: 64px; gap: 40px; }
+    .home-intro { display: flex; align-items: end; justify-content: space-between; gap: 24px; }
+    .home-intro h1 { margin: 0 0 8px; font-size: clamp(1.75rem, 4vw, 2.5rem); }
+    .home-intro p { margin: 0; color: var(--text-muted); }
+    .home-intro-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    .home-section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+    .home-section-heading h2 { margin: 0; font-size: 1.25rem; }
+    .home-section-heading a { font-size: 0.875rem; font-weight: 600; }
+    @media (max-width: 640px) {
+      .home-page { padding-top: 28px; gap: 30px; }
+      .home-intro { align-items: flex-start; flex-direction: column; gap: 18px; }
+      .home-intro-actions { width: 100%; }
     }
   </style>
 </head>
 <body>
   <header id="site-header"></header>
 
-  <main>
-    <section id="events" class="container event-browser">
-      <div class="page-heading row-between">
-        <div>
-          <h1>Explore events</h1>
-          <p class="muted">Seminars, talks, and workshops.</p>
-        </div>
-        <button type="button" id="find-ticket-btn" class="btn btn-secondary">Find my ticket</button>
+  <main class="container home-page stack-lg">
+    <section class="home-intro">
+      <div>
+        <h1>Find your next event</h1>
+        <p>Seminars, talks, and workshops coming up.</p>
       </div>
-
-      <div class="event-browser-toolbar">
-        <div class="tabs" role="tablist" aria-label="Event categories" id="event-tabs">
-          <button type="button" class="tab-btn" role="tab" id="tab-live" data-tab="live" aria-selected="false" aria-controls="events-panel">
-            Happening now <span class="chip chip-muted" id="count-live">0</span>
-          </button>
-          <button type="button" class="tab-btn" role="tab" id="tab-upcoming" data-tab="upcoming" aria-selected="true" aria-controls="events-panel">
-            Upcoming <span class="chip chip-muted" id="count-upcoming">0</span>
-          </button>
-          <button type="button" class="tab-btn" role="tab" id="tab-past" data-tab="past" aria-selected="false" aria-controls="events-panel">
-            Past <span class="chip chip-muted" id="count-past">0</span>
-          </button>
-        </div>
-
-        <div class="event-search-wrap">
-          <label class="sr-only" for="event-search">Search events by title or venue</label>
-          <input id="event-search" class="input" type="search" placeholder="Search events">
-        </div>
+      <div class="home-intro-actions">
+        <a class="btn btn-primary" href="/explore">Explore events</a>
+        <a class="btn btn-secondary" href="/tickets">My tickets</a>
       </div>
+    </section>
 
-      <div id="events-panel" role="tabpanel" aria-live="polite" class="stack"></div>
+    <section class="stack" aria-labelledby="home-upcoming-heading">
+      <div class="home-section-heading">
+        <h2 id="home-upcoming-heading">Upcoming events</h2>
+        <a href="/explore">See all events</a>
+      </div>
+      <div id="home-events" aria-live="polite" class="stack">
+        <div class="events-grid" id="home-events-loading"></div>
+      </div>
     </section>
   </main>
 
   <footer id="site-footer"></footer>
-
-  <script type="module" src="/web/assets/js/pages/landing.js"></script>
+  <script type="module" src="/web/assets/js/pages/home.js"></script>
   <script type="module" src="/web/assets/js/theme.js"></script>
 </body>
 </html>

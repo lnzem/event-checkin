@@ -17,7 +17,7 @@ export async function renderPublicNav({ active = '' } = {}) {
   const activePage = active || (
     path === '/tickets'
       ? 'tickets'
-      : path === '/' && window.location.hash !== '#events'
+      : path === '/'
         ? 'home'
         : 'events'
   );
@@ -51,7 +51,7 @@ export async function renderPublicNav({ active = '' } = {}) {
         </a>
         <nav class="primary-nav" aria-label="Main navigation">
           <a class="nav-link" href="/"${activePage === 'home' ? ' aria-current="page"' : ''}><span class="nav-link-icon"><img src="/web/assets/icons/home.svg" alt=""></span>Home</a>
-          <a class="nav-link" href="/#events"${activePage === 'events' ? ' aria-current="page"' : ''}><span class="nav-link-icon"><img src="/web/assets/icons/search.svg" alt=""></span>Explore</a>
+          <a class="nav-link" href="/explore"${activePage === 'events' ? ' aria-current="page"' : ''}><span class="nav-link-icon"><img src="/web/assets/icons/search.svg" alt=""></span>Explore</a>
           <a class="nav-link" href="${ticketsHref}"${activePage === 'tickets' ? ' aria-current="page"' : ''}><span class="nav-link-icon"><img src="/web/assets/icons/bell.svg" alt=""></span>My tickets</a>
         </nav>
         <div class="nav-actions">${authHtml}</div>
@@ -73,7 +73,7 @@ export async function renderPublicNav({ active = '' } = {}) {
       <a href="/"${activePage === 'home' ? ' aria-current="page"' : ''}>
         <span class="mobile-nav-icon"><img src="/web/assets/icons/home.svg" alt=""></span><span>Home</span>
       </a>
-      <a href="/#events"${activePage === 'events' ? ' aria-current="page"' : ''}>
+      <a href="/explore"${activePage === 'events' ? ' aria-current="page"' : ''}>
         <span class="mobile-nav-icon"><img src="/web/assets/icons/search.svg" alt=""></span><span>Explore</span>
       </a>
       <a href="${ticketsHref}"${activePage === 'tickets' ? ' aria-current="page"' : ''}>
