@@ -1,6 +1,6 @@
 import { GOOGLE_LOGIN } from '../config.js';
 import { getSupabase } from '../supabase-client.js';
-import { getSession, safeNext } from '../auth.js';
+import { claimMyRegistrations, getSession, safeNext } from '../auth.js';
 import { escapeHtml } from '../ui.js';
 
 const content = document.getElementById('login-content');
@@ -39,14 +39,10 @@ function getEmailSendError(error) {
 }
 
 async function handleSignedIn() {
-  const supabase = getSupabase();
-  if (!sessionStorage.getItem('tickets_claimed')) {
-    try {
-      await supabase.rpc('claim_my_registrations');
-      sessionStorage.setItem('tickets_claimed', '1');
-    } catch (err) {
-      console.error('claim_my_registrations error:', err);
-    }
+  try {
+    await claimMyRegistrations();
+  } catch (err) {
+    console.error('claim_my_registrations error:', err?.code || err?.message || 'unknown error');
   }
   window.location.replace(nextPath);
 }

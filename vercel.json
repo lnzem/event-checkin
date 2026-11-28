@@ -24,6 +24,7 @@
     { "source": "/register", "destination": "/web/register/index.html" },
     { "source": "/login", "destination": "/web/login/index.html" },
     { "source": "/tickets", "destination": "/web/tickets/index.html" },
+    { "source": "/profile", "destination": "/web/profile/index.html" },
     { "source": "/admin/login", "destination": "/web/admin/login/index.html" },
     { "source": "/admin", "destination": "/web/admin/index.html" },
     { "source": "/admin/event", "destination": "/web/admin/event/index.html" },

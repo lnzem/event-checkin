@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Profile — Regismeow</title>
+  <meta name="description" content="View and update your profile details.">
+  <script src="/web/assets/js/theme-init.js"></script>
+  <link rel="stylesheet" href="/web/assets/css/main.css">
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container stack-lg" style="padding-top:32px;padding-bottom:48px;max-width:760px;">
+    <div class="stack-sm">
+      <h1 style="margin:0;">My Profile</h1>
+      <p class="muted" style="margin:0;">Manage your account details.</p>
+    </div>
+    <section class="card">
+      <form id="profile-form" class="stack" style="max-width:460px;" novalidate>
+        <div class="field">
+          <label class="field-label" for="prof-email">Email</label>
+          <input id="prof-email" class="input" type="email" readonly>
+        </div>
+        <div class="field">
+          <label class="field-label" for="prof-name">Full Name</label>
+          <input id="prof-name" class="input" type="text" required aria-describedby="prof-name-err">
+          <span id="prof-name-err" class="field-error" hidden></span>
+        </div>
+        <div class="field">
+          <label class="field-label" for="prof-org">Organization</label>
+          <input id="prof-org" class="input" type="text" required aria-describedby="prof-org-err">
+          <span id="prof-org-err" class="field-error" hidden></span>
+        </div>
+        <div class="field">
+          <label class="field-label" for="prof-phone">Contact Number</label>
+          <input id="prof-phone" class="input" type="tel" required aria-describedby="prof-phone-err">
+          <span id="prof-phone-err" class="field-error" hidden></span>
+        </div>
+        <div>
+          <button type="submit" id="prof-save-btn" class="btn btn-primary">Save details</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script type="module" src="/web/assets/js/pages/profile.js"></script>
+  <script type="module" src="/web/assets/js/theme.js"></script>
+</body>
+</html>

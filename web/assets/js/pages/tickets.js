@@ -1,7 +1,7 @@
 import QRCode from 'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/+esm';
 import { renderPublicNav } from '../nav.js';
 import { getSupabase } from '../supabase-client.js';
-import { getProfile, requireUser } from '../auth.js';
+import { claimMyRegistrations, requireUser } from '../auth.js';
 import { apiFetch } from '../api.js';
 import { formatEventDate, getEventPhase } from '../events.js';
 import { escapeHtml, openModal, renderSkeleton, toast } from '../ui.js';
@@ -14,6 +14,7 @@ let userEmail = '';
 let activeTab = 'upcoming';
 let tickets = [];
 let emailCooldownUntil = 0;
+let ticketClaimError = false;
 
 function formatCheckedInTime(iso) {
   if (!iso) return '';
@@ -261,7 +262,32 @@ async function loadTickets(session) {
 
     if (error) throw error;
     tickets = data || [];
-    renderTickets();
+    if (tickets.length === 0 && ticketClaimError) {
+      panel.innerHTML = `
+        <div class="empty-state stack-sm">
+          <h2>We couldn’t link your tickets yet</h2>
+          <p class="muted" style="margin:0;">Try again to find registrations made with this email.</p>
+          <div><button type="button" class="btn btn-primary" id="retry-ticket-claim-btn">Try again</button></div>
+        </div>
+      `;
+      document.getElementById('retry-ticket-claim-btn')?.addEventListener('click', async () => {
+        const btn = document.getElementById('retry-ticket-claim-btn');
+        btn.disabled = true;
+        btn.textContent = 'Checking…';
+        try {
+          await claimMyRegistrations();
+          ticketClaimError = false;
+          await loadTickets(session);
+        } catch (err) {
+          console.error('claim_my_registrations error:', err?.code || err?.message || 'unknown error');
+          btn.disabled = false;
+          btn.textContent = 'Try again';
+          toast('Could not link tickets right now. Please try again.', { type: 'danger' });
+        }
+      });
+    } else {
+      renderTickets();
+    }
   } catch (err) {
     console.error('Failed to load tickets:', err);
     panel.innerHTML = `
@@ -272,81 +298,6 @@ async function loadTickets(session) {
     `;
     document.getElementById('retry-tickets-btn')?.addEventListener('click', () => loadTickets(session));
   }
-}
-
-function setupProfileForm(session, profile) {
-  const emailEl = document.getElementById('prof-email');
-  const nameEl = document.getElementById('prof-name');
-  const orgEl = document.getElementById('prof-org');
-  const phoneEl = document.getElementById('prof-phone');
-  const form = document.getElementById('profile-form');
-  const saveBtn = document.getElementById('prof-save-btn');
-
-  emailEl.value = session.user.email || '';
-  nameEl.value = profile?.full_name || '';
-  orgEl.value = profile?.organization || '';
-  phoneEl.value = profile?.contact_number || '';
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const fullName = nameEl.value.trim();
-    const organization = orgEl.value.trim();
-    const contactNumber = phoneEl.value.replace(/[\s-]+/g, '').trim();
-
-    const nameErr = document.getElementById('prof-name-err');
-    const orgErr = document.getElementById('prof-org-err');
-    const phoneErr = document.getElementById('prof-phone-err');
-
-    let valid = true;
-    if (fullName.length < 2 || fullName.length > 100) {
-      nameEl.setAttribute('aria-invalid', 'true');
-      nameErr.textContent = '! Full name must be at least 2 characters.';
-      nameErr.hidden = false;
-      valid = false;
-    } else {
-      nameEl.removeAttribute('aria-invalid');
-      nameErr.hidden = true;
-    }
-
-    if (organization.length < 2 || organization.length > 100) {
-      orgEl.setAttribute('aria-invalid', 'true');
-      orgErr.textContent = '! Organization must be at least 2 characters.';
-      orgErr.hidden = false;
-      valid = false;
-    } else {
-      orgEl.removeAttribute('aria-invalid');
-      orgErr.hidden = true;
-    }
-
-    if (!/^(09\d{9}|\+639\d{9})$/.test(contactNumber)) {
-      phoneEl.setAttribute('aria-invalid', 'true');
-      phoneErr.textContent = '! Enter a valid PH mobile number (09XXXXXXXXX or +639XXXXXXXXX).';
-      phoneErr.hidden = false;
-      valid = false;
-    } else {
-      phoneEl.removeAttribute('aria-invalid');
-      phoneErr.hidden = true;
-    }
-
-    if (!valid) return;
-
-    saveBtn.disabled = true;
-    saveBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> Saving…';
-    try {
-      const supabase = getSupabase();
-      const { error } = await supabase
-        .from('profiles')
-        .update({ full_name: fullName, organization, contact_number: contactNumber })
-        .eq('id', session.user.id);
-      if (error) throw error;
-      toast('Details saved!', { type: 'success' });
-    } catch (err) {
-      toast(err.message || 'Could not save details.', { type: 'danger' });
-    } finally {
-      saveBtn.disabled = false;
-      saveBtn.textContent = 'Save details';
-    }
-  });
 }
 
 tabButtons.forEach((btn) => {
@@ -365,18 +316,14 @@ async function init() {
   userEmail = session.user.email || '';
   subtitle.textContent = userEmail;
 
-  const supabase = getSupabase();
-  if (!sessionStorage.getItem('tickets_claimed')) {
-    try {
-      await supabase.rpc('claim_my_registrations');
-      sessionStorage.setItem('tickets_claimed', '1');
-    } catch {
-      // ignore
-    }
+  ticketClaimError = false;
+  try {
+    await claimMyRegistrations();
+  } catch (err) {
+    ticketClaimError = true;
+    console.error('claim_my_registrations error:', err?.code || err?.message || 'unknown error');
   }
 
-  const profile = await getProfile();
-  setupProfileForm(session, profile);
   loadTickets(session);
 }
 

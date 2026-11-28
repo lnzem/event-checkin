@@ -34,6 +34,13 @@ export async function getProfile() {
   return data;
 }
 
+export async function claimMyRegistrations() {
+  const supabase = getSupabase();
+  const { data, error } = await supabase.rpc('claim_my_registrations');
+  if (error) throw error;
+  return Number(data || 0);
+}
+
 export async function requireUser() {
   const session = await getSession();
   if (!session) {

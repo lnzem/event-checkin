@@ -17,12 +17,14 @@ export async function renderPublicNav({ active = '' } = {}) {
   const activePage = active || (
     path === '/tickets'
       ? 'tickets'
-      : path === '/'
-        ? 'home'
-        : 'events'
+      : path === '/profile'
+        ? 'profile'
+        : path === '/'
+          ? 'home'
+          : 'events'
   );
   const ticketsHref = session ? '/tickets' : '/login?next=%2Ftickets';
-  const profileHref = session ? '/tickets#my-details-panel' : '/login';
+  const profileHref = session ? '/profile' : '/login?next=%2Fprofile';
 
   if (headerMount) {
     const email = session?.user?.email || '';
@@ -82,7 +84,7 @@ export async function renderPublicNav({ active = '' } = {}) {
       <a href="${ticketsHref}"${activePage === 'tickets' ? ' aria-current="page"' : ''}>
         <span class="mobile-nav-icon"><img src="/web/assets/icons/bell.svg" alt=""></span><span>Tickets</span>
       </a>
-      <a href="${profileHref}">
+      <a href="${profileHref}"${activePage === 'profile' ? ' aria-current="page"' : ''}>
         <span class="mobile-nav-icon"><img src="/web/assets/icons/user.svg" alt=""></span><span>Profile</span>
       </a>
     `;
