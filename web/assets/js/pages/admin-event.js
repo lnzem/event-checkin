@@ -110,12 +110,20 @@ function renderEditor(initial = {}) {
           <span id="err-desc" class="field-error" hidden></span>
         </div>
 
-        <div class="field">
-          <label class="field-label" for="ev-venue">Venue</label>
-          <input id="ev-venue" class="input" type="text" maxlength="150" value="${escapeHtml(venueVal)}" placeholder="Building, campus, city, or full address" aria-describedby="hint-venue err-venue">
-          <span id="hint-venue" class="field-hint">This location will appear on the event page map.</span>
-          <span id="err-venue" class="field-error" hidden></span>
-        </div>
+        <section class="field" aria-labelledby="location-heading">
+          <h2 id="location-heading" class="field-label" style="font-size:1rem;margin:0;">Location &amp; map</h2>
+          <div>
+            <label class="field-label" for="ev-venue">Venue or address</label>
+            <input id="ev-venue" class="input" type="text" maxlength="150" value="${escapeHtml(venueVal)}" placeholder="Search by venue name or enter a full address" aria-describedby="hint-venue err-venue">
+            <span id="hint-venue" class="field-hint">This address creates the map shown to attendees.</span>
+            <span id="err-venue" class="field-error" hidden></span>
+          </div>
+          <div class="admin-map-preview" aria-live="polite">
+            <div id="map-preview-empty" class="admin-map-empty">Enter a venue or address to preview its map.</div>
+            <iframe id="map-preview-frame" title="Map preview of the event venue" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" hidden></iframe>
+          </div>
+          <a id="map-open-link" class="btn btn-secondary btn-sm admin-map-open" target="_blank" rel="noopener noreferrer" hidden>Open in Google Maps</a>
+        </section>
 
         <div class="row" style="align-items:flex-start;">
           <div class="field" style="flex:1;min-width:200px;">
@@ -182,12 +190,31 @@ function renderEditor(initial = {}) {
   const titleEl = document.getElementById('ev-title');
   const descEl = document.getElementById('ev-desc');
   const venueEl = document.getElementById('ev-venue');
+  const mapFrame = document.getElementById('map-preview-frame');
+  const mapEmpty = document.getElementById('map-preview-empty');
+  const mapOpenLink = document.getElementById('map-open-link');
   const startsEl = document.getElementById('ev-starts');
   const endsEl = document.getElementById('ev-ends');
   const capEl = document.getElementById('ev-capacity');
   const statusEl = document.getElementById('ev-status');
   const previewCard = document.getElementById('live-preview-card');
   const saveBanner = document.getElementById('save-banner');
+
+  let mapPreviewTimer;
+  function updateMapPreview() {
+    const venue = venueEl.value.trim();
+    const canPreview = Boolean(venue) && !/^(venue tba|tba|to be announced|online|virtual)(\b|\s|\/|$)/i.test(venue);
+    mapEmpty.hidden = canPreview;
+    mapFrame.hidden = !canPreview;
+    mapOpenLink.hidden = !canPreview;
+    if (!canPreview) {
+      mapFrame.removeAttribute('src');
+      return;
+    }
+    const query = encodeURIComponent(venue);
+    mapFrame.src = `https://www.google.com/maps?q=${query}&output=embed`;
+    mapOpenLink.href = `https://www.google.com/maps/search/?api=1&query=${query}`;
+  }
 
   function getPreviewEvent() {
     return {
@@ -211,10 +238,15 @@ function renderEditor(initial = {}) {
   }
 
   updatePreview();
+  updateMapPreview();
   [titleEl, descEl, venueEl, startsEl, endsEl, capEl, statusEl].forEach((el) => {
     el.addEventListener('input', () => {
       dirty = true;
       updatePreview();
+      if (el === venueEl) {
+        window.clearTimeout(mapPreviewTimer);
+        mapPreviewTimer = window.setTimeout(updateMapPreview, 450);
+      }
     });
   });
 
