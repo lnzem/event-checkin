@@ -8,6 +8,7 @@
   <meta property="og:title" content="My Tickets — Live">
   <meta property="og:description" content="View your upcoming and past event tickets, QR codes, and profile details.">
   <meta property="og:type" content="website">
+  <script src="/web/assets/js/theme-init.js"></script>
   <link rel="stylesheet" href="/web/assets/css/main.css">
   <style>
     .ticket-card {
@@ -26,7 +27,7 @@
       aspect-ratio: 16 / 9;
       border-radius: var(--radius-sm);
       object-fit: cover;
-      background: #e8f3ef;
+      background: var(--surface-subtle);
     }
     .qr-modal-box {
       background: #ffffff;
@@ -97,5 +98,6 @@
   <footer id="site-footer"></footer>
 
   <script type="module" src="/web/assets/js/pages/tickets.js"></script>
+  <script type="module" src="/web/assets/js/theme.js"></script>
 </body>
 </html>

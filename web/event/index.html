@@ -8,6 +8,7 @@
   <meta property="og:title" content="Event Details — Live">
   <meta property="og:description" content="View event details, schedule, venue, and register for your QR ticket.">
   <meta property="og:type" content="website">
+  <script src="/web/assets/js/theme-init.js"></script>
   <link rel="stylesheet" href="/web/assets/css/main.css">
   <style>
     .cover-banner {
@@ -15,7 +16,7 @@
       aspect-ratio: 1.8 / 1;
       border-radius: 12px;
       overflow: hidden;
-      background: #e8f3ef;
+      background: var(--surface-subtle);
     }
     .cover-banner img {
       width: 100%;
@@ -30,7 +31,7 @@
       align-items: start;
     }
     .cover-banner { grid-area: cover; }
-    .event-sidebar { grid-area: sidebar; background: #f7f7f8; border: 0; }
+    .event-sidebar { grid-area: sidebar; background: var(--surface-subtle); border: 0; }
     .event-sidebar h1 { margin: 0; font-size: 1.5rem; line-height: 1.25; }
     .event-meta { color: var(--text-muted); font-size: 0.875rem; }
     .event-meta span { color: var(--text-muted); }
@@ -60,7 +61,7 @@
         z-index: 45;
         padding: 12px 24px calc(12px + env(safe-area-inset-bottom));
         border-top: 1px solid var(--border);
-        background: #fff;
+        background: var(--surface);
       }
       .has-event-action.has-mobile-nav { padding-bottom: 154px; }
     }
@@ -104,5 +105,6 @@
   <footer id="site-footer"></footer>
 
   <script type="module" src="/web/assets/js/pages/event.js"></script>
+  <script type="module" src="/web/assets/js/theme.js"></script>
 </body>
 </html>

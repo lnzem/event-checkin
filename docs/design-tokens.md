@@ -5,11 +5,11 @@ Source: supplied Figma mockups for the Live event discovery and registration exp
 ## Identity
 
 - Brand: Live
-- Style: clean, light, event-focused, responsive
+- Style: clean, event-focused, responsive; light and dark themes
 - Type: Inter with system sans-serif fallbacks
 - Accent: warm orange, used for primary actions and active navigation
 
-## CSS variables
+## Light theme variables
 
 ```css
 :root {
@@ -29,9 +29,11 @@ Source: supplied Figma mockups for the Live event discovery and registration exp
 }
 ```
 
+Dark mode overrides the background, surface, text, border, status, and accent tokens when `data-theme="dark"` is set. The theme control follows the device preference until the visitor chooses a theme, then remembers that choice in the browser.
+
 ## Layout and components
 
-- Page background is white, with light gray form surfaces and subtle borders.
+- Light mode uses a white page background, with light gray form surfaces and subtle borders. Dark mode uses charcoal surfaces with high contrast text.
 - Main content uses a centered 1120px container; the event, registration, and ticket views adapt to narrow screens.
 - Header is a 68px white navigation bar on desktop and 60px on mobile. Mobile uses a simple fixed bottom navigation.
 - Use Inter, with a 24px semibold brand, 15px navigation/body text, and 18px semibold section headings.

@@ -47,6 +47,19 @@
   --desktop-max-width: 460px;
 }
 
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg: #111317;
+  --color-surface: #191c21;
+  --color-text: #f2f3f5;
+  --color-text-muted: #a3a8b2;
+  --color-accent: #ff915b;
+  --color-accent-ink: #181a1e;
+  --color-qr-ink: #24262b;
+  --color-qr-muted: #666b70;
+  --color-error: #f07872;
+}
+
 *,
 *::before,
 *::after {
