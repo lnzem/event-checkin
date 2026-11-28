@@ -87,6 +87,13 @@ export function getPhaseBadge(phase) {
   }
 }
 
+export const eventIcons = {
+  calendar: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3.5v3M16 3.5v3M3.5 9.5h17M8 13h3m2 0h3M8 16.5h3"/></svg>',
+  pin: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.2"/></svg>',
+  people: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 20v-1.6a3.4 3.4 0 0 0-3.4-3.4H7.4A3.4 3.4 0 0 0 4 18.4V20m13-5a3.2 3.2 0 0 1 3 3.2V20M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm6-6.5a3.5 3.5 0 0 1 0 6.8"/></svg>',
+  arrow: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>',
+};
+
 export function renderEventCard(event, { now = new Date(), preview = false } = {}) {
   const phase = getEventPhase(event, now);
   const badge = getPhaseBadge(phase);
@@ -132,15 +139,15 @@ export function renderEventCard(event, { now = new Date(), preview = false } = {
         <span class="event-date-badge"><span>${escapeHtml(month)}</span><strong>${escapeHtml(day)}</strong></span>
       </div>
       <div class="event-card-body">
-        <p class="event-date">${escapeHtml(shortDate)}</p>
+        <p class="event-date"><span class="event-card-icon">${eventIcons.calendar}</span>${escapeHtml(shortDate)}</p>
         <div class="event-card-title-row">
           <h3>${escapeHtml(event.title || 'Untitled event')}</h3>
           <span class="chip ${badge.cls}">${escapeHtml(badge.label)}</span>
         </div>
-        <p class="event-venue">${escapeHtml(event.venue || 'Venue TBA')}</p>
+        <p class="event-venue"><span class="event-card-icon">${eventIcons.pin}</span>${escapeHtml(event.venue || 'Venue TBA')}</p>
         <div class="event-card-footer">
-          <span class="event-availability">${escapeHtml(availabilityText)}</span>
-          <span class="event-card-link">${isOpen ? 'View event' : 'View details'} <span aria-hidden="true">→</span></span>
+          <span class="event-availability"><span class="event-card-icon">${eventIcons.people}</span>${escapeHtml(availabilityText)}</span>
+          <span class="event-card-link">${isOpen ? 'View event' : 'View details'} ${eventIcons.arrow}</span>
         </div>
       </div>
     </a>
