@@ -3,6 +3,7 @@ import { getSupabase } from '../supabase-client.js';
 import { apiFetch } from '../api.js';
 import { formatEventDate } from '../events.js';
 import { confirmDialog, escapeHtml, renderSkeleton, toast } from '../ui.js';
+import QRCode from 'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/+esm';
 
 const root = document.getElementById('attendees-root');
 const params = new URLSearchParams(window.location.search);
@@ -170,7 +171,7 @@ function renderTable() {
 
       return `
         <tr data-reg-id="${escapeHtml(r.id)}">
-          <td data-label="Name"><strong>${escapeHtml(r.full_name)}</strong></td>
+          <td data-label="Name"><div class="attendee-identity"><img class="attendee-qr" data-qr-ticket="${escapeHtml(r.ticket_id)}" alt="QR invite for ${escapeHtml(r.full_name)}" width="56" height="56"><strong>${escapeHtml(r.full_name)}</strong></div></td>
           <td data-label="Email">${escapeHtml(r.email)}</td>
           <td data-label="Organization">${escapeHtml(r.organization)}</td>
           <td data-label="Contact">${escapeHtml(r.contact_number)}</td>
@@ -199,7 +200,7 @@ function renderTable() {
       <table class="data-table">
         <thead>
           <tr>
-            <th aria-sort="${ariaSort('full_name')}"><button type="button" class="sort-btn" data-sort="full_name">Name</button></th>
+            <th aria-sort="${ariaSort('full_name')}"><button type="button" class="sort-btn" data-sort="full_name">Attendee</button></th>
             <th>Email</th>
             <th>Organization</th>
             <th>Contact</th>
@@ -220,6 +221,16 @@ function renderTable() {
       </div>
     </div>
   `;
+
+  Promise.all(rows.map(async (r) => {
+    const img = container.querySelector(`[data-qr-ticket="${CSS.escape(r.ticket_id)}"]`);
+    if (!img) return;
+    try {
+      img.src = await QRCode.toDataURL(r.ticket_id, { width: 112, margin: 1, errorCorrectionLevel: 'M' });
+    } catch {
+      img.hidden = true;
+    }
+  }));
 
   container.querySelectorAll('[data-sort]').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -250,11 +261,31 @@ function renderTable() {
   container.querySelectorAll('[data-action="row-menu"]').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const menu = btn.nextElementSibling;
+      const regId = btn.closest('tr')?.dataset.regId;
+      const menu = document.querySelector(`.attendee-menu-floating[data-owner="${CSS.escape(regId || '')}"]`) || btn.nextElementSibling;
       const open = !menu.hidden;
-      container.querySelectorAll('.dropdown-menu').forEach((m) => { m.hidden = true; });
-      menu.hidden = open;
+      closeRowMenus();
+      if (!open) {
+        const rect = btn.getBoundingClientRect();
+        menu.hidden = false;
+        menu.classList.add('attendee-menu-floating');
+        document.body.appendChild(menu);
+        const menuRect = menu.getBoundingClientRect();
+        const top = rect.bottom + menuRect.height <= window.innerHeight - 8
+          ? rect.bottom + 6
+          : Math.max(8, rect.top - menuRect.height - 6);
+        menu.style.left = `${Math.max(8, Math.min(rect.right - menuRect.width, window.innerWidth - menuRect.width - 8))}px`;
+        menu.style.top = `${top}px`;
+        menu.dataset.owner = regId;
+      }
       btn.setAttribute('aria-expanded', String(!open));
+      if (open) menu.hidden = true;
+    });
+  });
+  container.querySelectorAll('.dropdown-menu').forEach((menu) => {
+    menu.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeRowMenus();
     });
   });
 
@@ -343,9 +374,23 @@ function renderTable() {
   });
 }
 
-document.addEventListener('click', () => {
-  root.querySelectorAll('.dropdown-menu').forEach((m) => { m.hidden = true; });
-});
+function closeRowMenus() {
+  document.querySelectorAll('.attendee-menu-floating').forEach((menu) => {
+    menu.hidden = true;
+    const regId = menu.dataset.owner;
+    menu.classList.remove('attendee-menu-floating');
+    menu.style.left = '';
+    menu.style.top = '';
+    delete menu.dataset.owner;
+    const trigger = root.querySelector(`[data-reg-id="${CSS.escape(regId || '')}"] [data-action="row-menu"]`);
+    trigger?.setAttribute('aria-expanded', 'false');
+    if (trigger?.parentElement) trigger.parentElement.appendChild(menu);
+  });
+  root.querySelectorAll('.dropdown-menu').forEach((menu) => { menu.hidden = true; });
+}
+
+document.addEventListener('click', closeRowMenus);
+window.addEventListener('scroll', closeRowMenus, true);
 
 async function exportCsv() {
   const btn = document.getElementById('export-csv-btn');

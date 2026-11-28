@@ -29,6 +29,18 @@
       align-items: center;
       gap: 4px;
     }
+    .attendee-identity { display: flex; align-items: center; gap: 12px; min-width: 170px; }
+    .attendee-qr {
+      flex: 0 0 56px;
+      width: 56px;
+      height: 56px;
+      padding: 3px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      image-rendering: pixelated;
+    }
+    .attendee-menu-floating { position: fixed; z-index: 100; }
   </style>
 </head>
 <body>
