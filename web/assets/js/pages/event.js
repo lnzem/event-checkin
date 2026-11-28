@@ -95,6 +95,29 @@ function renderEvent() {
 
   const formattedDate = formatEventDate(ev.starts_at, ev.ends_at);
   const descriptionHtml = escapeHtml(ev.description || 'No description provided.').replace(/\r?\n/g, '<br>');
+  const venue = String(ev.venue || '').trim();
+  const hasMapLocation = venue && !/^(venue tba|tba|to be announced|online|virtual)(\b|\s|\/|$)/i.test(venue);
+  const locationHtml = hasMapLocation
+    ? `
+      <section class="card stack-sm">
+        <div class="row-between">
+          <div>
+            <h2 style="font-size:1.25rem;margin:0;">Location</h2>
+            <p class="muted" style="margin:4px 0 0;">${escapeHtml(venue)}</p>
+          </div>
+          <a class="btn btn-secondary btn-sm" href="https://www.google.com/maps/search/?api=1&amp;query=${encodeURIComponent(venue)}" target="_blank" rel="noopener noreferrer">Open in Maps</a>
+        </div>
+        <div class="event-map">
+          <iframe
+            src="https://www.google.com/maps?q=${encodeURIComponent(venue)}&amp;output=embed"
+            title="Map showing ${escapeHtml(venue)}"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen></iframe>
+        </div>
+      </section>
+    `
+    : '';
 
   root.innerHTML = `
     <div class="stack-lg">
@@ -124,6 +147,8 @@ function renderEvent() {
               <button type="button" class="btn btn-secondary btn-sm" id="copy-link-btn">Copy link</button>
             </div>
           </section>
+
+          ${locationHtml}
         </div>
 
         <aside class="card stack event-sidebar">

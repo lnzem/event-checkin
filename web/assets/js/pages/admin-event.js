@@ -112,7 +112,8 @@ function renderEditor(initial = {}) {
 
         <div class="field">
           <label class="field-label" for="ev-venue">Venue</label>
-          <input id="ev-venue" class="input" type="text" maxlength="150" value="${escapeHtml(venueVal)}" aria-describedby="err-venue">
+          <input id="ev-venue" class="input" type="text" maxlength="150" value="${escapeHtml(venueVal)}" placeholder="Building, campus, city, or full address" aria-describedby="hint-venue err-venue">
+          <span id="hint-venue" class="field-hint">This location will appear on the event page map.</span>
           <span id="err-venue" class="field-error" hidden></span>
         </div>
 
